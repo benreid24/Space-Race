@@ -17,6 +17,8 @@ Environment::Environment() {
         "NeutronEarth", "Planets/earth.anim", {800, 900},
         {0, 0}, 100000, false, true, 200
     ));
+
+    camera.zoom(0.5f);
 }
 
 Environment::Environment(File& file) {
