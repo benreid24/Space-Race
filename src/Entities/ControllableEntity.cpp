@@ -25,7 +25,7 @@ Entity::Ptr ControllableEntity::create(
 
 Entity::Ptr ControllableEntity::createPlayer(const sf::Vector2f& position, const sf::Vector2f& velocity) {
     return Entity::Ptr(new ControllableEntity(
-        "Player", "player.anim", position, velocity, 10, true, false, PlayerController::create()
+        "Player", "ship.anim", position, velocity, 10, true, false, PlayerController::create()
     ));
 }
 

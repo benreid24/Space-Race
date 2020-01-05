@@ -1,3 +1,6 @@
 [submodule "lib/SFML"]
 	path = lib/SFML
 	url = git@github.com:SFML/SFML.git
+[submodule "tools/AnimationEditor"]
+	path = tools/AnimationEditor
+	url = git@github.com:benreid24/Animation-Editor-2.git
