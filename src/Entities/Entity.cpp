@@ -30,6 +30,17 @@ void Entity::update(float dt) {
     animation.update();
 }
 
+const std::string& Entity::getName() const {
+    return name;
+}
+
+sf::FloatRect Entity::getBoundingBox() const {
+    return sf::FloatRect(
+        position - animation.getSize() / 2.0f,
+        animation.getSize()
+    );
+}
+
 const sf::Vector2f& Entity::getPosition() const {
     return position;
 }

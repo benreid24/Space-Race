@@ -19,6 +19,9 @@ public:
     typedef std::weak_ptr<Entity>   WeakPtr;
     typedef std::list<Ptr>          List;
 
+    const std::string& getName() const;
+    sf::FloatRect getBoundingBox() const;
+
     const sf::Vector2f& getPosition() const;
     const sf::Vector2f& getVelocity() const;
     const sf::Vector2f& getAcceleration() const;
