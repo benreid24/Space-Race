@@ -1,5 +1,5 @@
 #include <Media/Animation.hpp>
-#include <Util/File.hpp>
+#include <Util/BinaryFile.hpp>
 #include <Util/ResourcePool.hpp>
 #include <Util/Timer.hpp>
 #include <Properties.hpp>
@@ -24,15 +24,15 @@ AnimationSource::~AnimationSource()
 
 void AnimationSource::load(const string& file)
 {
-    File input(file);
+    BinaryFile input(file);
     AnimationFrame temp;
     int maxL = 0;
-    string path = File::getPath(file);
+    string path = BinaryFile::getPath(file);
 
     spriteSheetFile = input.getString();
-    if (File::exists(path+spriteSheetFile))
+    if (BinaryFile::exists(path+spriteSheetFile))
 		sheet = imagePool.loadResource(path+spriteSheetFile);
-	else if (File::exists(Properties::SpriteSheetPath+spriteSheetFile))
+	else if (BinaryFile::exists(Properties::SpriteSheetPath+spriteSheetFile))
 		sheet = imagePool.loadResource(Properties::SpriteSheetPath+spriteSheetFile);
     loop = bool(input.get<uint8_t>());
     int numFrames = input.get<uint16_t>();

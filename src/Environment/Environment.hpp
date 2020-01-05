@@ -2,7 +2,7 @@
 #define ENVIRONMENT_HPP
 
 #include <Entities/Entity.hpp>
-#include <Util/File.hpp>
+#include <Util/BinaryFile.hpp>
 
 /**
  * Represents a playable level and all entities within
@@ -22,9 +22,9 @@ public:
     Environment();
 
     /**
-     * Loads the Environment from the File
+     * Loads the Environment from the BinaryFile
      */
-    Environment(File& file);
+    Environment(BinaryFile& file);
 
     /**
      * Updates the environment and all entities within

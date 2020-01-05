@@ -21,7 +21,7 @@ Environment::Environment() {
     camera.zoom(0.5f);
 }
 
-Environment::Environment(File& file) {
+Environment::Environment(BinaryFile& file) {
     // TODO
 }
 

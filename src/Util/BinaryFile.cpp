@@ -1,17 +1,17 @@
-#include <Util/File.hpp>
+#include <Util/BinaryFile.hpp>
 #include <iostream>
 #include <algorithm>
 #include <dirent.h>
 #include <direct.h>
 using namespace std;
 
-bool File::exists(const string& filename)
+bool BinaryFile::exists(const string& filename)
 {
     ifstream file(filename.c_str());
     return file.good();
 }
 
-void File::copy(const string& src, const string& dest) {
+void BinaryFile::copy(const string& src, const string& dest) {
     if (src == dest)
         return;
 
@@ -24,22 +24,22 @@ void File::copy(const string& src, const string& dest) {
     std::copy(begin_source, end_source, begin_dest);
 }
 
-File::File()
+BinaryFile::BinaryFile()
 {
     //ctor
 }
 
-File::File(const string& name, OpenMode mode)
+BinaryFile::BinaryFile(const string& name, OpenMode mode)
 {
     setFile(name, mode);
 }
 
-File::~File()
+BinaryFile::~BinaryFile()
 {
     file.close();
 }
 
-void File::setFile(const string& name, OpenMode mode)
+void BinaryFile::setFile(const string& name, OpenMode mode)
 {
     if (file.is_open())
         file.close();
@@ -48,7 +48,7 @@ void File::setFile(const string& name, OpenMode mode)
         file.open(name.c_str(), ios::in|ios::binary);
     else
     {
-        File::exists(name); //ensure file exists
+        BinaryFile::exists(name); //ensure file exists
         file.open(name.c_str(), ios::binary | ios::out);
     }
 
@@ -56,12 +56,12 @@ void File::setFile(const string& name, OpenMode mode)
         cout << "Failed to open datafile: " << name << '\n';
 }
 
-void File::close()
+void BinaryFile::close()
 {
     file.close();
 }
 
-string File::getExtension(const string& file)
+string BinaryFile::getExtension(const string& file)
 {
     string ret;
     for (unsigned int i = 0; i<file.size(); ++i)
@@ -74,7 +74,7 @@ string File::getExtension(const string& file)
     return ret;
 }
 
-string File::getBaseName(const string& file)
+string BinaryFile::getBaseName(const string& file)
 {
     string ret;
     for (int i = file.size()-1; i>=0; --i)
@@ -92,7 +92,7 @@ string File::getBaseName(const string& file)
     return ret;
 }
 
-string File::getPath(const string& file)
+string BinaryFile::getPath(const string& file)
 {
 	string ret, temp;
 	for (unsigned int i = 0; i<file.size(); ++i)
@@ -108,11 +108,11 @@ string File::getPath(const string& file)
 	return ret;
 }
 
-string File::stripPath(const string& file) {
+string BinaryFile::stripPath(const string& file) {
     return getBaseName(file) + "." + getExtension(file);
 }
 
-vector<string> File::listDirectory(string dir, const string& ext, bool inclSubdirs) {
+vector<string> BinaryFile::listDirectory(string dir, const string& ext, bool inclSubdirs) {
     DIR* cDir;
     struct dirent* cFile;
     vector<string> total;
@@ -128,11 +128,11 @@ vector<string> File::listDirectory(string dir, const string& ext, bool inclSubdi
             string tmp = cFile->d_name;
             if (tmp.find(".")!=string::npos)
             {
-                if (tmp.size()>2 && File::getExtension(tmp)==ext)
+                if (tmp.size()>2 && BinaryFile::getExtension(tmp)==ext)
 					total.push_back(dir+tmp);
             }
             else if (inclSubdirs) {
-                vector<string> files = File::listDirectory(dir+tmp,ext,true);
+                vector<string> files = BinaryFile::listDirectory(dir+tmp,ext,true);
 				total.insert(total.end(), files.begin(), files.end());
             }
         }
@@ -140,7 +140,7 @@ vector<string> File::listDirectory(string dir, const string& ext, bool inclSubdi
     return total;
 }
 
-void File::createDirectories(const string& dir) {
+void BinaryFile::createDirectories(const string& dir) {
     string cd;
     cd.reserve(dir.size());
     for (unsigned int i = 0; i<dir.size(); ++i) {
@@ -155,7 +155,7 @@ void File::createDirectories(const string& dir) {
 #include <windows.h>
 #include <shlobj.h>
 
-string File::getFile(const string& name, const string& ext, bool s, bool c)
+string BinaryFile::getFile(const string& name, const string& ext, bool s, bool c)
 {
     OPENFILENAME ofn;
     char fileName[MAX_PATH] = "";
@@ -195,7 +195,7 @@ string File::getFile(const string& name, const string& ext, bool s, bool c)
     return fileNameStr;
 }
 
-string File::getFolder() {
+string BinaryFile::getFolder() {
 	BROWSEINFO binf = {0};
 	TCHAR path[MAX_PATH];
 	binf.ulFlags |= BIF_NEWDIALOGSTYLE|BIF_RETURNONLYFSDIRS;

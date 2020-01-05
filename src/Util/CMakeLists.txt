@@ -1,6 +1,6 @@
 target_sources(SpaceRace PUBLIC
-    File.hpp
-    File.cpp
+    BinaryFile.hpp
+    BinaryFile.cpp
     ResourcePool.hpp
     ResourcePool.cpp
     ResourceTypes.hpp
