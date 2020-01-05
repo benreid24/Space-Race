@@ -141,8 +141,9 @@ public:
      * Sets the source of the animation
      *
      * \param src The AnimationSource to use
+     * \param centerOrigin True to center the animation at the origin, false for top left
      */
-    void setSource(AnimationReference src);
+    void setSource(AnimationReference src, bool centerOrigin);
 
     /**
      * Updates the animation. Sets the proper frame based on elapsed time since the last call to update

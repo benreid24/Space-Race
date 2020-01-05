@@ -17,8 +17,27 @@ class Entity {
 public:
     typedef std::shared_ptr<Entity> Ptr;
 
+    /**
+     * Creates an Entity
+     * 
+     * \param name The name of the Entity
+     * \param animFile The file to load animation from
+     * \param position The global position to spawn at
+     * \param velocity The starting velocity
+     * \param mass The mass of the entity. Determines gravitational pull and range
+     * \param canMove True if moveable and can be affected force/acceleration
+     * \param hasGravity Whether or not the Entity emits gravity
+     */
+    static Ptr create(
+        const std::string& name, const std::string& animFile, const sf::Vector2f& position,
+        const sf::Vector2f& velocity, float mass, bool canMove, bool hasGravity, float gRange = -1
+    );
+
+    virtual ~Entity() = default;
+
     const std::string& getName() const;
     sf::FloatRect getBoundingBox() const;
+    float distanceToSquared(const sf::Vector2f& position) const;
 
     const sf::Vector2f& getPosition() const;
     const sf::Vector2f& getVelocity() const;
@@ -42,40 +61,33 @@ public:
      */
     void render(sf::RenderTarget& target);
 
-protected:
     /**
-     * Creates an Entity
-     * 
-     * \param name The name of the Entity
-     * \param animFile The file to load animation from
-     * \param position The global position to spawn at
-     * \param velocity The starting velocity
-     * \param mass The mass of the entity. Determines gravitational pull and range
-     * \param canMove True if moveable and can be affected force/acceleration
-     * \param hasGravity Whether or not the Entity emits gravity
+     * Testing only
      */
-    Entity(const std::string& name, const std::string& animFile, const sf::Vector2f& position,
-           const sf::Vector2f& velocity, float mass, bool canMove, bool hasGravity);
+    void reset(const sf::Vector2f& pos);
 
-    virtual ~Entity() = default;
+protected:
+    Entity(const std::string& name, const std::string& animFile, const sf::Vector2f& position,
+           const sf::Vector2f& velocity, float mass, bool canMove, bool hasGravity, float gRange = -1);
 
     /**
      * Called from update() before velocity and position are updated
      */
-    virtual void customUpdateLogic(float dt) = 0;
+    virtual void customUpdateLogic(float dt) {}
 
 private:
-    std::string name;
+    const std::string name;
     AnimationReference animSrc;
     Animation animation;
 
     sf::Vector2f position;
     sf::Vector2f velocity;
     sf::Vector2f acceleration;
-    float mass;
-    const float gravitationalRange;
-    bool canMove;
-    bool hasGravity;
+    const float mass;
+    const float gravitationalRange, gRangeSqrd;
+    const float minGravDist;
+    const bool canMove;
+    const bool hasGravity;
 };
 
 /**

@@ -176,12 +176,13 @@ Animation::~Animation()
     //dtor
 }
 
-void Animation::setSource(AnimationReference src)
+void Animation::setSource(AnimationReference src, bool co)
 {
     animSrc = src;
     curFrm = 0;
     lastFrmChangeTime = Timer::get().timeElapsedMilliseconds();
     looping = animSrc->isLooping();
+    isCenterOrigin = co;
 }
 
 void Animation::update()

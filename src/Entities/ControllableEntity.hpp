@@ -18,7 +18,7 @@ public:
     static Entity::Ptr create(
         const std::string& name, const std::string& animFile, 
         const sf::Vector2f& position, const sf::Vector2f& velocity,
-        float mass, bool canMove, bool hasGravity,
+        float mass, bool canMove, bool hasGravity, float gRange,
         EntityController::Ptr controller
     );
 
@@ -34,7 +34,7 @@ private:
 
     ControllableEntity(const std::string& name, const std::string& animFile, 
                        const sf::Vector2f& position, const sf::Vector2f& velocity,
-                       float mass, bool canMove, bool hasGravity,
+                       float mass, bool canMove, bool hasGravity, float gRange,
                        EntityController::Ptr controller);
 
     virtual void customUpdateLogic(float dt) override;

@@ -42,6 +42,7 @@ public:
     PlayerStatus getPlayerStatus() const;
 
 private:
+    sf::View camera;
     sf::Color background;
     std::vector<Entity::Ptr> entities;
     Entity::Ptr player;

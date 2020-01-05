@@ -11,10 +11,10 @@
 class Properties
 {
 public:
-    static constexpr float GravitationalConstant = 0.00001;
+    static constexpr float GravitationalConstant = 1500;
 
-    static const int ScreenWidth = 800;
-    static const int ScreenHeight = 600;
+    static const int ScreenWidth = 1920;
+    static const int ScreenHeight = 1080;
 
     static const std::string FontPath;
 
