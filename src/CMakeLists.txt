@@ -1,5 +1,10 @@
-add_executable(SpaceRace main.cpp)
+add_executable(SpaceRace
+    main.cpp
+    Properties.hpp
+    Properties.cpp
+)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DGAME)
 
 target_link_libraries(SpaceRace
@@ -10,6 +15,11 @@ target_link_libraries(SpaceRace
     sfml-system
     sfml-main
 )
+
+add_subdirectory(Entities)
+add_subdirectory(Environment)
+add_subdirectory(Media)
+add_subdirectory(Util)
 
 install(TARGETS SpaceRace DESTINATION ${PROJECT_SOURCE_DIR})
 if (WIN32)
