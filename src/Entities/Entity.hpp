@@ -16,8 +16,6 @@
 class Entity {
 public:
     typedef std::shared_ptr<Entity> Ptr;
-    typedef std::weak_ptr<Entity>   WeakPtr;
-    typedef std::list<Ptr>          List;
 
     const std::string& getName() const;
     sf::FloatRect getBoundingBox() const;
@@ -62,7 +60,7 @@ protected:
     virtual ~Entity() = default;
 
     /**
-     * Called from update() after velocity and position are updated but before acceleration is reset
+     * Called from update() before velocity and position are updated
      */
     virtual void customUpdateLogic(float dt) = 0;
 

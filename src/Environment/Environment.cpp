@@ -1,7 +1,11 @@
 #include <Environment/Environment.hpp>
 
+#include <Entities/ControllableEntity.hpp>
+
 Environment::Environment() {
     background = sf::Color::Black;
+    player = ControllableEntity::createPlayer({250, 800}, {0, 0});
+    entities.push_back(player);
 }
 
 Environment::Environment(File& file) {

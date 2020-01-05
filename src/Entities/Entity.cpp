@@ -8,9 +8,10 @@ namespace {
 const float minAccel = 1; // minimum for gravity to apply
 }
 
-Entity::Entity(const std::string& name, const std::string& animFile,
-               const sf::Vector2f& position, const sf::Vector2f& velocity,
-               float mass, bool canMove, bool hasGravity)
+Entity::Entity(
+    const std::string& name, const std::string& animFile,
+    const sf::Vector2f& position, const sf::Vector2f& velocity,
+    float mass, bool canMove, bool hasGravity)
 : name(name)
 , animSrc(animPool.loadResource(Properties::EntityAnimationPath+animFile))
 , position(position), velocity(velocity), mass(mass)
@@ -21,11 +22,13 @@ Entity::Entity(const std::string& name, const std::string& animFile,
 }
 
 void Entity::update(float dt) {
+    customUpdateLogic(dt);
+
     const sf::Vector2f& vi = velocity;
     position.x += vi.x*dt + acceleration.x*dt*dt/2;
     position.y = vi.y*dt + acceleration.y*dt*dt/2;
     velocity += acceleration*dt;
-    customUpdateLogic(dt);
+    
     acceleration.x = acceleration.y = 0;
     animation.update();
 }
