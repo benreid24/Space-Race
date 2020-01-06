@@ -1,6 +1,8 @@
 target_sources(SpaceRace PUBLIC
     BinaryFile.hpp
     BinaryFile.cpp
+    JsonFile.hpp
+    JsonFile.cpp
     ResourcePool.hpp
     ResourcePool.cpp
     ResourceTypes.hpp
@@ -10,3 +12,5 @@ target_sources(SpaceRace PUBLIC
     Util.cpp
     UUID.hpp
 )
+
+add_subdirectory(JSON)
