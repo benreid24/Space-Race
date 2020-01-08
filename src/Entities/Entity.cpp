@@ -47,9 +47,10 @@ void Entity::update(float dt) {
     velocity += acceleration * dt;
 
     rotation += rotationRate * dt;
+
     rotationRate = 0;
-    
     acceleration.x = acceleration.y = 0;
+    strongestGravity.magnitude = 0;
     animation.update();
 }
 
@@ -118,6 +119,13 @@ sf::Vector2f Entity::getGravitationalAcceleration(const sf::Vector2f& pos) const
 
 sf::Vector2f Entity::getGravitationalAcceleration(Entity::Ptr entity) const {
     return getGravitationalAcceleration(entity->getPosition());
+}
+
+void Entity::applyGravityToEntity(Entity::Ptr entity) const {
+    if (hasGravity && this != entity.get()) {
+        if (distanceToSquared(entity->getPosition()) <= gRangeSqrd) 
+            entity->applyAcceleration(getGravitationalAcceleration(entity));
+    }
 }
 
 void Entity::applyForce(const sf::Vector2f& force) {

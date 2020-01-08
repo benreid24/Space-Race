@@ -78,8 +78,7 @@ Environment::Environment(const std::string& file) {
 void Environment::update(float dt) {
     for (Entity::Ptr entity : entities) {
         for (Entity::Ptr gravEnt : entities) {
-            if (entity.get() != gravEnt.get())
-                entity->applyAcceleration(gravEnt->getGravitationalAcceleration(entity));
+            gravEnt->applyGravityToEntity(entity);
         }
         entity->update(dt);
     }
@@ -87,6 +86,7 @@ void Environment::update(float dt) {
 
 void Environment::render(sf::RenderTarget& target) {
     camera.setCenter(player->getPosition());
+    camera.setRotation(player->getRotation());
     target.setView(camera);
 
     target.clear(background);

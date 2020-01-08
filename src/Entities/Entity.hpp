@@ -9,6 +9,7 @@
 
 #include <Media/Animation.hpp>
 #include <Util/ResourceTypes.hpp>
+#include <Util/AngularVector.hpp>
 
 /**
  * Base class for any object that can exist in the Environment
@@ -51,6 +52,7 @@ public:
     float getGravitationalRange() const;
     sf::Vector2f getGravitationalAcceleration(const sf::Vector2f& position) const;
     sf::Vector2f getGravitationalAcceleration(Ptr entity) const;
+    void applyGravityToEntity(Ptr entity) const;
 
     void applyForce(const sf::Vector2f& force);
     void applyAcceleration(const sf::Vector2f& acceleration);
@@ -95,7 +97,7 @@ private:
     const bool canMove;
     const bool hasGravity;
 
-    void calculateRotation();
+    AngularVectorF strongestGravity;
 };
 
 /**
