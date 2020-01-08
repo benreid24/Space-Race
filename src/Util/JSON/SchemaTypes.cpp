@@ -56,7 +56,7 @@ SchemaValue::SchemaValue(const SchemaList& listType)
 SchemaValue::SchemaValue(const SchemaGroup& group)
 : type(JsonValue::Group), data(group) {}
 
-SchemaValue::SchemaValue(std::optional<double> minVal, std::optional<double> maxVal)
+SchemaValue::SchemaValue(std::optional<float> minVal, std::optional<float> maxVal)
 : type(JsonValue::Numeric), data(std::make_pair(minVal, maxVal)) {}
 
 SchemaValue::SchemaValue(const std::list<std::string>& values)
@@ -70,9 +70,9 @@ bool SchemaValue::validate(const JsonValue& value, bool strict) const {
 
     switch (type) {
     case JsonValue::Numeric: {
-            const double* val = value.getAsNumeric();
+            const float* val = value.getAsNumeric();
             if (val) {
-                auto limits = *std::get_if<std::pair<std::optional<double>, std::optional<double> > >(&data);
+                auto limits = *std::get_if<std::pair<std::optional<float>, std::optional<float> > >(&data);
                 if (*val < limits.first.value_or((*val) - 1)) {
                     error(value.info()) << "Numeric JsonValue is too low. Min: " << limits.first.value() << std::endl;
                     return false;

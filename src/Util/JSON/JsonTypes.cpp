@@ -9,7 +9,7 @@ JsonValue::JsonValue(bool value)
 JsonValue::JsonValue(const std::string& value)
 : type(String), data(value) {}
 
-JsonValue::JsonValue(double value)
+JsonValue::JsonValue(float value)
 : type(Numeric), data(value) {}
 
 JsonValue::JsonValue(const JsonList& value)
@@ -30,8 +30,8 @@ const std::string* JsonValue::getAsString() const {
     return std::get_if<std::string>(&data);
 }
 
-const double* JsonValue::getAsNumeric() const {
-    return std::get_if<double>(&data);
+const float* JsonValue::getAsNumeric() const {
+    return std::get_if<float>(&data);
 }
 
 const JsonList* JsonValue::getAsList() const {

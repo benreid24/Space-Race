@@ -44,7 +44,7 @@ public:
     /**
      * Loads the next numeric value
      */
-    double loadNumeric();
+    float loadNumeric();
 
     /**
      * Helper function to determine if a character is numeric

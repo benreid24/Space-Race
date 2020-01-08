@@ -127,7 +127,7 @@ bool JsonLoader::isNumber(char c) {
     return c >= '0' && c <= '9';
 }
 
-double JsonLoader::loadNumeric() {
+float JsonLoader::loadNumeric() {
     if (isValid()) {
         const char c = peekNextSymbol();
         if (c == '-' || (c >= '0' && c <= '9')) {

@@ -70,7 +70,7 @@ public:
 
     JsonValue() : type(Unknown) {}
     JsonValue(bool value);
-    JsonValue(double value);
+    JsonValue(float value);
     JsonValue(const std::string& value);
     JsonValue(const JsonList& value);
     JsonValue(const JsonGroup& value);
@@ -78,7 +78,7 @@ public:
     Type getType() const;
     const bool* getAsBool() const;
     const std::string* getAsString() const;
-    const double* getAsNumeric() const;
+    const float* getAsNumeric() const;
     const JsonList* getAsList() const;
     const JsonGroup* getAsGroup() const;
 
@@ -89,7 +89,7 @@ public:
 
 private:
     const Type type;
-    const std::variant<bool, std::string, double, JsonGroup, JsonList> data;
+    const std::variant<bool, std::string, float, JsonGroup, JsonList> data;
     JsonSourceInfo source;
 };
 
