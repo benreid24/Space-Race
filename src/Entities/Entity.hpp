@@ -9,6 +9,7 @@
 
 #include <Media/Animation.hpp>
 #include <Util/ResourceTypes.hpp>
+#include <Util/AngularVector.hpp>
 
 /**
  * Base class for any object that can exist in the Environment
@@ -40,6 +41,9 @@ public:
     sf::FloatRect getBoundingBox() const;
     float distanceToSquared(const sf::Vector2f& position) const;
 
+    float getRotation() const;
+    void applyRotation(float rate);
+
     const sf::Vector2f& getPosition() const;
     const sf::Vector2f& getVelocity() const;
     const sf::Vector2f& getAcceleration() const;
@@ -48,6 +52,7 @@ public:
     float getGravitationalRange() const;
     sf::Vector2f getGravitationalAcceleration(const sf::Vector2f& position) const;
     sf::Vector2f getGravitationalAcceleration(Ptr entity) const;
+    void applyGravityToEntity(Ptr entity) const;
 
     void applyForce(const sf::Vector2f& force);
     void applyAcceleration(const sf::Vector2f& acceleration);
@@ -81,14 +86,18 @@ private:
     AnimationReference animSrc;
     Animation animation;
 
+    float rotation;
+    float rotationRate; //TODO - persistent rotation rate
     sf::Vector2f position;
-    sf::Vector2f velocity;
+    sf::Vector2f velocity; //TODO - position provider. on rails, physics, etc. Control to capture into orbit
     sf::Vector2f acceleration;
     const float mass;
     const float gravitationalRange, gRangeSqrd;
     const float minGravDist;
     const bool canMove;
     const bool hasGravity;
+
+    AngularVectorF strongestGravity; //TODO - track parent body for orbit capture
 };
 
 /**

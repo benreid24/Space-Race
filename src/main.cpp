@@ -30,7 +30,7 @@ int main() {
             }
         }
 
-        environment.update(Timer::get().timeElapsedSeconds() - lastPhysicsTime);
+        environment.update((Timer::get().timeElapsedSeconds() - lastPhysicsTime)/2);
 
         if (Timer::get().timeElapsedSeconds() - lastRenderTime >= renderTimeGap) {
             environment.render(window);

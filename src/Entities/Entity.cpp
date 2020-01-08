@@ -17,6 +17,8 @@ Entity::Entity(
 : name(name)
 , animSrc(animPool.loadResource(Properties::EntityAnimationPath+animFile))
 , animation(animSrc, true)
+, rotation(0)
+, rotationRate(0)
 , position(position), velocity(velocity), mass(mass)
 , gravitationalRange(gRange <= 0 ? std::sqrt(Properties::GravitationalConstant * mass)/minAccel : gRange)
 , gRangeSqrd(gravitationalRange * gravitationalRange)
@@ -42,9 +44,13 @@ void Entity::update(float dt) {
     const sf::Vector2f& vi = velocity;
     position.x += vi.x*dt + acceleration.x*dt*dt/2;
     position.y += vi.y*dt + acceleration.y*dt*dt/2;
-    velocity += acceleration*dt;
-    
+    velocity += acceleration * dt;
+
+    rotation += rotationRate * dt;
+
+    rotationRate = 0;
     acceleration.x = acceleration.y = 0;
+    strongestGravity.magnitude = 0;
     animation.update();
 }
 
@@ -63,6 +69,14 @@ float Entity::distanceToSquared(const sf::Vector2f& pos) const {
     const float dx = position.x - pos.x;
     const float dy = position.y - pos.y;
     return dx*dx + dy*dy;
+}
+
+float Entity::getRotation() const {
+    return rotation;
+}
+
+void Entity::applyRotation(float rate) {
+    rotationRate += rate;
 }
 
 const sf::Vector2f& Entity::getPosition() const {
@@ -107,6 +121,13 @@ sf::Vector2f Entity::getGravitationalAcceleration(Entity::Ptr entity) const {
     return getGravitationalAcceleration(entity->getPosition());
 }
 
+void Entity::applyGravityToEntity(Entity::Ptr entity) const {
+    if (hasGravity && this != entity.get()) {
+        if (distanceToSquared(entity->getPosition()) <= gRangeSqrd) 
+            entity->applyAcceleration(getGravitationalAcceleration(entity));
+    }
+}
+
 void Entity::applyForce(const sf::Vector2f& force) {
     applyAcceleration(force / mass);
 }
@@ -132,7 +153,7 @@ void Entity::render(sf::RenderTarget& target) {
     }
 
     animation.setPosition(position);
-    //TODO - rotation
+    animation.setRotation(rotation);
     animation.draw(target);
 }
 

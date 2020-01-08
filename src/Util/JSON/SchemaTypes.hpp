@@ -53,7 +53,7 @@ public:
     /**
      * Expect to be a numeric type with optional bounds
      */
-    SchemaValue(std::optional<double> minVal, std::optional<double> maxVal);
+    SchemaValue(std::optional<float> minVal, std::optional<float> maxVal);
 
     /**
      * Expect to be a string type, optionally one of a list of valid values
@@ -72,7 +72,7 @@ private:
     const std::variant<
         SchemaList,
         SchemaGroup,
-        std::pair<std::optional<double>, std::optional<double> >,
+        std::pair<std::optional<float>, std::optional<float> >,
         std::list<std::string>,
         blank
     > data;

@@ -66,7 +66,8 @@ bool AnimationSource::isLooping() const
     return loop;
 }
 
-const std::vector<sf::Sprite>& AnimationSource::getFrame(unsigned int i, Vector2f pos, bool centerOrigin)
+const std::vector<sf::Sprite>& AnimationSource::getFrame(
+    unsigned int i, Vector2f pos, float rot, bool centerOrigin)
 {
     if (i>=frames.size() || !sheet) {
         return sprites;
@@ -84,7 +85,7 @@ const std::vector<sf::Sprite>& AnimationSource::getFrame(unsigned int i, Vector2
 		sf::Vector2f offset = Vector2f(sp.getGlobalBounds().width/2,sp.getGlobalBounds().height/2) - sp.getOrigin();
 		if (!centerOrigin)
             offset = -sp.getOrigin();
-		sp.setRotation(frames[i][j].rotation);
+		sp.setRotation(frames[i][j].rotation + rot);
 		sp.setPosition(pos+frames[i][j].renderOffset-offset);
 		sprites[j] = sp;
     }
@@ -96,7 +97,7 @@ sf::Vector2f AnimationSource::getFrameSize(unsigned int n) {
         return Vector2f(0,0);
 
     sf::FloatRect bounds(0, 0, 0, 0); //width/height = right/bottom
-    const vector<Sprite>& pieces = getFrame(n, Vector2f(0,0), false);
+    const vector<Sprite>& pieces = getFrame(n, Vector2f(0,0), 0, false);
 
     for (unsigned int i = 0; i<pieces.size(); ++i) {
         FloatRect pb = pieces[i].getGlobalBounds();
@@ -154,6 +155,7 @@ bool AnimationSource::spritesheetFound() const {
 
 Animation::Animation()
 {
+    rotation = 0;
     curFrm = lastFrmChangeTime = 0;
     playing = false;
     isCenterOrigin = false;
@@ -228,7 +230,7 @@ Vector2f Animation::getSize() const {
 	Vector2f zero(0,0);
 	if (!animSrc)
         return zero;
-	vector<Sprite> frames = animSrc->getFrame(0, zero, isCenterOrigin);
+	vector<Sprite> frames = animSrc->getFrame(0, zero, 0, isCenterOrigin);
 	if (frames.size()==0)
 		return zero;
 	return Vector2f(frames[0].getGlobalBounds().width, frames[0].getGlobalBounds().height);
@@ -260,13 +262,17 @@ void Animation::setPosition(Vector2f pos)
     position = pos;
 }
 
+void Animation::setRotation(float angle) {
+    rotation = angle;
+}
+
 void Animation::draw(sf::RenderTarget& window)
 {
     if (!animSrc)
         return;
 
     update();
-    const std::vector<Sprite>& t = animSrc->getFrame(curFrm, position, isCenterOrigin);
+    const std::vector<Sprite>& t = animSrc->getFrame(curFrm, position, rotation, isCenterOrigin);
     for (unsigned int i = 0; i<t.size(); ++i)
 		window.draw(t[i]);
 }
