@@ -54,10 +54,10 @@ bool JsonGroup::hasField(const std::string& name) const {
     return fields.find(name) != fields.end();
 }
 
-const JsonField* JsonGroup::getField(const std::string& name) const {
+const JsonValue* JsonGroup::getField(const std::string& name) const {
     auto iter = fields.find(name);
     if (iter != fields.end())
-        return &iter->second;
+        return &iter->second.getValue();
     return nullptr;
 }
 

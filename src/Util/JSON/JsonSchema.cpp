@@ -14,6 +14,7 @@ const JsonSchema& JsonSchema::environmentFileSchema() {
     static SchemaValue anyString(std::list<std::string>(0));
     static SchemaValue anyNumber({}, {});
     static SchemaValue positiveNumber(0, {});
+    static SchemaValue colorNumber(0, 255);
 
     // Entity List
     static SchemaGroup entityGroup;
@@ -35,6 +36,27 @@ const JsonSchema& JsonSchema::environmentFileSchema() {
     static SchemaList entityList = {entityValue}; // no min/max size
     static SchemaValue entityListValue(entityList);
 
+    // Color
+    static SchemaGroup colorGroup;
+    static bool cGrpInit = false;
+    if (!cGrpInit) {
+        cGrpInit = true;
+        colorGroup.addExpectedField("red", colorNumber);
+        colorGroup.addExpectedField("green", colorNumber);
+        colorGroup.addExpectedField("blue", colorNumber);
+    }
+    static SchemaValue colorValue(colorGroup);
+
+    // Background
+    static SchemaGroup backgroundGroup;
+    static bool bgGrpInit = false;
+    if (!bgGrpInit) {
+        bgGrpInit = true;
+        backgroundGroup.addExpectedField("color", colorValue);
+        // TODO - implement "one of" expectation. Separate struct w/ fields. adds to group
+    }
+    static SchemaValue backgroundValue(backgroundGroup);
+
     // Player Spawn
     static SchemaGroup spawnGroup;
     static bool spGrpInit = false;
@@ -51,9 +73,9 @@ const JsonSchema& JsonSchema::environmentFileSchema() {
     if (!wzGrpInit) {
         wzGrpInit = true;
         winZoneGroup.addExpectedField("top", positiveNumber);
-        winZoneGroup.addExpectedField("right", positiveNumber);
-        winZoneGroup.addExpectedField("bottom", positiveNumber);
         winZoneGroup.addExpectedField("left", positiveNumber);
+        winZoneGroup.addExpectedField("width", positiveNumber);
+        winZoneGroup.addExpectedField("height", positiveNumber);
     }
     static SchemaValue winGroupValue(winZoneGroup);
 
@@ -65,6 +87,7 @@ const JsonSchema& JsonSchema::environmentFileSchema() {
         mainGroup.addExpectedField("name", anyString);
         mainGroup.addExpectedField("width", positiveNumber);
         mainGroup.addExpectedField("height", positiveNumber);
+        mainGroup.addExpectedField("background", backgroundValue);
         mainGroup.addExpectedField("winZone", winGroupValue);
         mainGroup.addExpectedField("playerSpawn", spawnValue);
         mainGroup.addExpectedField("entities", entityListValue);

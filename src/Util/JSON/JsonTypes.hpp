@@ -40,7 +40,7 @@ public:
 
     void addField(const std::string& name, const JsonField& field);
     bool hasField(const std::string& name) const;
-    const JsonField* getField(const std::string& name) const;
+    const JsonValue* getField(const std::string& name) const;
     const std::vector<std::string> getFields() const;
     
     const JsonSourceInfo& info() const { return source; }

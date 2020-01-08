@@ -29,7 +29,7 @@ bool SchemaGroup::validate(const JsonGroup& group, bool strict) const {
             valid = false;
         }
         else {
-            if (!field.second.validate(group.getField(field.first)->getValue(), strict))
+            if (!field.second.validate(*group.getField(field.first), strict))
                 valid = false;
             expectedFields.erase(std::find(expectedFields.begin(), expectedFields.end(), field.first));
             fields.erase(std::find(fields.begin(), fields.end(), field.first));

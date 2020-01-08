@@ -1,23 +1,30 @@
 {
     "name": "Test world",
     "width": 2000,
-    "height": 10000,
+    "height": 2000,
+    "background": {
+        "color": {
+            "red": 255,
+            "green": 100,
+            "blue": 100
+        }
+    },
     "winZone": {
-        "left": 0,
         "top": 0,
-        "right": 900,
-        "bottom": 300
+        "left": 0,
+        "width": 900,
+        "height": 300
     },
     "playerSpawn": {
-        "x": 1000,
-        "y": 9000
+        "x": 50,
+        "y": 500
     },
     "entities": [
         {
             "name": "test entity 1",
             "gfx": "Planets/earth.anim",
             "x": 1300,
-            "y": 3500,
+            "y": 1000,
             "vx": 0,
             "vy": 0,
             "mass": 10000,
@@ -28,8 +35,8 @@
         {
             "name": "test entity 2",
             "gfx": "Planets/earth.anim",
-            "x": 1300,
-            "y": 7500,
+            "x": 500,
+            "y": 1500,
             "vx": 0,
             "vy": 0,
             "mass": 150000,
