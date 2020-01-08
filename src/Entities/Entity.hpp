@@ -40,6 +40,9 @@ public:
     sf::FloatRect getBoundingBox() const;
     float distanceToSquared(const sf::Vector2f& position) const;
 
+    float getRotation() const;
+    void applyRotation(float rate);
+
     const sf::Vector2f& getPosition() const;
     const sf::Vector2f& getVelocity() const;
     const sf::Vector2f& getAcceleration() const;
@@ -81,10 +84,11 @@ private:
     AnimationReference animSrc;
     Animation animation;
 
+    float rotation;
+    float rotationRate;
     sf::Vector2f position;
     sf::Vector2f velocity;
     sf::Vector2f acceleration;
-    float rotation;
     const float mass;
     const float gravitationalRange, gRangeSqrd;
     const float minGravDist;

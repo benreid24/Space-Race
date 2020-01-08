@@ -18,13 +18,14 @@ Entity::Entity(
 , animSrc(animPool.loadResource(Properties::EntityAnimationPath+animFile))
 , animation(animSrc, true)
 , rotation(0)
+, rotationRate(0)
 , position(position), velocity(velocity), mass(mass)
 , gravitationalRange(gRange <= 0 ? std::sqrt(Properties::GravitationalConstant * mass)/minAccel : gRange)
 , gRangeSqrd(gravitationalRange * gravitationalRange)
 , minGravDist((animation.getSize().x + animation.getSize().y)/2)
 , canMove(canMove), hasGravity(hasGravity)
 {
-    calculateRotation();
+    // noop
 }
 
 Entity::Ptr Entity::create(
@@ -43,17 +44,13 @@ void Entity::update(float dt) {
     const sf::Vector2f& vi = velocity;
     position.x += vi.x*dt + acceleration.x*dt*dt/2;
     position.y += vi.y*dt + acceleration.y*dt*dt/2;
-    velocity += acceleration*dt;
+    velocity += acceleration * dt;
+
+    rotation += rotationRate * dt;
+    rotationRate = 0;
     
     acceleration.x = acceleration.y = 0;
     animation.update();
-    calculateRotation();
-}
-
-void Entity::calculateRotation() {
-    if (std::abs(velocity.x) > 0 || std::abs(velocity.y) > 0) {
-        rotation = std::atan2(velocity.y, velocity.x) * 180 / 3.1415926 + Properties::StdToSFMLRotationOffset;
-    }
 }
 
 const std::string& Entity::getName() const {
@@ -71,6 +68,14 @@ float Entity::distanceToSquared(const sf::Vector2f& pos) const {
     const float dx = position.x - pos.x;
     const float dy = position.y - pos.y;
     return dx*dx + dy*dy;
+}
+
+float Entity::getRotation() const {
+    return rotation;
+}
+
+void Entity::applyRotation(float rate) {
+    rotationRate += rate;
 }
 
 const sf::Vector2f& Entity::getPosition() const {

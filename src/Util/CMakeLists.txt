@@ -1,4 +1,5 @@
 target_sources(SpaceRace PUBLIC
+    AngularVector.hpp
     BinaryFile.hpp
     BinaryFile.cpp
     JsonFile.hpp
