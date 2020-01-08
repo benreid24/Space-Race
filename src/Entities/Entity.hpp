@@ -87,9 +87,9 @@ private:
     Animation animation;
 
     float rotation;
-    float rotationRate;
+    float rotationRate; //TODO - persistent rotation rate
     sf::Vector2f position;
-    sf::Vector2f velocity;
+    sf::Vector2f velocity; //TODO - position provider. on rails, physics, etc. Control to capture into orbit
     sf::Vector2f acceleration;
     const float mass;
     const float gravitationalRange, gRangeSqrd;
@@ -97,7 +97,7 @@ private:
     const bool canMove;
     const bool hasGravity;
 
-    AngularVectorF strongestGravity;
+    AngularVectorF strongestGravity; //TODO - track parent body for orbit capture
 };
 
 /**
