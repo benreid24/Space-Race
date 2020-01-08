@@ -5,6 +5,8 @@ sf::Font Properties::PrimaryFont;
 const std::string Properties::GameSavePath;
 const std::string Properties::FontPath = "Resources/Fonts/";
 
+const std::string Properties::EnvironmentFilePath = "Resources/Environments/";
+
 const std::string Properties::EntityAnimationPath = "Resources/Animations/Entities/";
 const std::string Properties::SpriteSheetPath = "Resources/Images/Spritesheets/";
 

@@ -18,7 +18,7 @@ Entity::Entity(
 , animSrc(animPool.loadResource(Properties::EntityAnimationPath+animFile))
 , animation(animSrc, true)
 , position(position), velocity(velocity), mass(mass)
-, gravitationalRange(gRange < 0 ? std::sqrt(Properties::GravitationalConstant * mass)/minAccel : gRange)
+, gravitationalRange(gRange <= 0 ? std::sqrt(Properties::GravitationalConstant * mass)/minAccel : gRange)
 , gRangeSqrd(gravitationalRange * gravitationalRange)
 , minGravDist((animation.getSize().x + animation.getSize().y)/2)
 , canMove(canMove), hasGravity(hasGravity)

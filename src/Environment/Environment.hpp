@@ -2,7 +2,6 @@
 #define ENVIRONMENT_HPP
 
 #include <Entities/Entity.hpp>
-#include <Util/File.hpp>
 
 /**
  * Represents a playable level and all entities within
@@ -22,9 +21,9 @@ public:
     Environment();
 
     /**
-     * Loads the Environment from the File
+     * Loads the Environment from the file
      */
-    Environment(File& file);
+    Environment(const std::string& file);
 
     /**
      * Updates the environment and all entities within
@@ -43,6 +42,8 @@ public:
 
 private:
     sf::View camera;
+
+    std::string name;
     sf::Color background;
     std::vector<Entity::Ptr> entities;
     Entity::Ptr player;

@@ -1,7 +1,10 @@
 #include <Environment/Environment.hpp>
 
+#include <iostream>
 #include <Properties.hpp>
 #include <Entities/ControllableEntity.hpp>
+#include <Util/JsonFile.hpp>
+#include <Util/JSON/JsonSchema.hpp>
 
 Environment::Environment() {
     camera.setSize(Properties::ScreenWidth, Properties::ScreenHeight);
@@ -21,8 +24,55 @@ Environment::Environment() {
     camera.zoom(0.5f);
 }
 
-Environment::Environment(File& file) {
-    // TODO
+Environment::Environment(const std::string& file) {
+    JsonFile input(Properties::EnvironmentFilePath+file);
+    if (!JsonSchema::environmentFileSchema().validate(input, true)) {
+        std::cerr << "Leaving environment empty on failed load" << std::endl;
+        return;
+    }
+    const JsonGroup& data = input.getRoot();
+
+    name = *data.getField("name")->getAsString();
+    victoryRegion.top = *data.getField("winZone")->getAsGroup()->getField("top")->getAsNumeric();
+    victoryRegion.left = *data.getField("winZone")->getAsGroup()->getField("left")->getAsNumeric();
+    victoryRegion.width = *data.getField("winZone")->getAsGroup()->getField("width")->getAsNumeric();
+    victoryRegion.height = *data.getField("winZone")->getAsGroup()->getField("height")->getAsNumeric();
+
+    const JsonGroup& color = *data.getField("background")->getAsGroup()->getField("color")->getAsGroup();
+    background.r = *color.getField("red")->getAsNumeric();
+    background.g = *color.getField("green")->getAsNumeric();
+    background.b = *color.getField("blue")->getAsNumeric();
+
+    const JsonGroup& spawn = *data.getField("playerSpawn")->getAsGroup();
+    player = ControllableEntity::createPlayer(
+        {
+            *spawn.getField("x")->getAsNumeric(),
+            *spawn.getField("y")->getAsNumeric()
+        },
+        {0, 0}
+    );
+    entities.push_back(player);
+
+    const JsonList& entityList = *data.getField("entities")->getAsList();
+    for (unsigned int i = 0; i<entityList.size(); ++i) {
+        const JsonGroup& entity = *entityList[i].getAsGroup();
+        entities.push_back(Entity::create(
+            *entity.getField("name")->getAsString(),
+            *entity.getField("gfx")->getAsString(),
+            {
+                *entity.getField("x")->getAsNumeric(),
+                *entity.getField("y")->getAsNumeric()
+            },
+            {
+                *entity.getField("vx")->getAsNumeric(),
+                *entity.getField("vy")->getAsNumeric()
+            },
+            *entity.getField("mass")->getAsNumeric(),
+            *entity.getField("canMove")->getAsBool(),
+            *entity.getField("hasGravity")->getAsBool(),
+            *entity.getField("gravityRange")->getAsNumeric()
+        ));
+    }
 }
 
 void Environment::update(float dt) {

@@ -12,7 +12,7 @@
  *
  * \ingroup Utilities
  */
-class File : private sf::NonCopyable
+class BinaryFile : private sf::NonCopyable
 {
     std::fstream file;
 
@@ -29,7 +29,7 @@ public:
     /**
      * Creates an empty file object with no data
      */
-    File();
+    BinaryFile();
 
     /**
      * Creates and loads the given file in the given mode
@@ -37,12 +37,12 @@ public:
      * \param name The path to the file to open
      * \param mode The mode to open the file in
      */
-    File(const std::string& name, OpenMode mode = In);
+    BinaryFile(const std::string& name, OpenMode mode = In);
 
     /**
      * Closes the file
      */
-    ~File();
+    ~BinaryFile();
 
     /**
      * Creates and loads the given file in the given mode

@@ -9,7 +9,7 @@ int main() {
     srand(time(0));
     Properties::PrimaryFont.loadFromFile(Properties::FontPath+"PressStart2P.ttf");
 
-    Environment environment;
+    Environment environment("test.json");
     sf::RenderWindow window(
         sf::VideoMode(Properties::ScreenWidth, Properties::ScreenHeight, 32),
         "Space Race",

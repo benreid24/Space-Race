@@ -1,5 +1,5 @@
 #include <Media/Playlist.hpp>
-#include <Util/File.hpp>
+#include <Util/BinaryFile.hpp>
 #include <Properties.hpp>
 #include <Util/Util.hpp>
 using namespace sf;
@@ -40,7 +40,7 @@ Playlist::~Playlist()
 
 void Playlist::load(string file, bool savePrev)
 {
-	if (file==curList || !File::exists(Properties::PlaylistPath+file))
+	if (file==curList || !BinaryFile::exists(Properties::PlaylistPath+file))
 		return;
 	stop();
 
@@ -49,7 +49,7 @@ void Playlist::load(string file, bool savePrev)
         prevList = curList;
     curList = file;
 
-    File input(Properties::PlaylistPath+file);
+    BinaryFile input(Properties::PlaylistPath+file);
     int size = input.get<uint16_t>();
 
     audio.stop();

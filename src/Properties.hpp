@@ -19,6 +19,8 @@ public:
     static const std::string FontPath;
 
     static const std::string GameSavePath;
+
+    static const std::string EnvironmentFilePath;
     
     static const std::string EntityAnimationPath;
     static const std::string SpriteSheetPath;
