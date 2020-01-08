@@ -17,13 +17,14 @@ Entity::Entity(
 : name(name)
 , animSrc(animPool.loadResource(Properties::EntityAnimationPath+animFile))
 , animation(animSrc, true)
+, rotation(0)
 , position(position), velocity(velocity), mass(mass)
 , gravitationalRange(gRange <= 0 ? std::sqrt(Properties::GravitationalConstant * mass)/minAccel : gRange)
 , gRangeSqrd(gravitationalRange * gravitationalRange)
 , minGravDist((animation.getSize().x + animation.getSize().y)/2)
 , canMove(canMove), hasGravity(hasGravity)
 {
-    // noop
+    calculateRotation();
 }
 
 Entity::Ptr Entity::create(
@@ -46,6 +47,13 @@ void Entity::update(float dt) {
     
     acceleration.x = acceleration.y = 0;
     animation.update();
+    calculateRotation();
+}
+
+void Entity::calculateRotation() {
+    if (std::abs(velocity.x) > 0 || std::abs(velocity.y) > 0) {
+        rotation = std::atan2(velocity.y, velocity.x) * 180 / 3.1415926 + Properties::StdToSFMLRotationOffset;
+    }
 }
 
 const std::string& Entity::getName() const {
@@ -132,7 +140,7 @@ void Entity::render(sf::RenderTarget& target) {
     }
 
     animation.setPosition(position);
-    //TODO - rotation
+    animation.setRotation(rotation);
     animation.draw(target);
 }
 

@@ -84,11 +84,14 @@ private:
     sf::Vector2f position;
     sf::Vector2f velocity;
     sf::Vector2f acceleration;
+    float rotation;
     const float mass;
     const float gravitationalRange, gRangeSqrd;
     const float minGravDist;
     const bool canMove;
     const bool hasGravity;
+
+    void calculateRotation();
 };
 
 /**

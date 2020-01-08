@@ -12,6 +12,7 @@ class Properties
 {
 public:
     static constexpr float GravitationalConstant = 1500;
+    static constexpr float StdToSFMLRotationOffset = 90;
 
     static const int ScreenWidth = 1920;
     static const int ScreenHeight = 1080;

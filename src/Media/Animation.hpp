@@ -72,10 +72,12 @@ public:
      *
      * \param i The index of the frame to return
      * \param pos The desired on screen position of the animation
+     * \param rotation Rotation angle offset in degrees
      * \param centerOrigin Whether or not to center the origin when offsetting
      * \return A vector of Sprite objects that are ready to be rendered
      */
-    const std::vector<sf::Sprite>& getFrame(unsigned int i, sf::Vector2f pos, bool centerOrigin);
+    const std::vector<sf::Sprite>& getFrame(unsigned int i, sf::Vector2f pos,
+                                            float rotation, bool centerOrigin);
 
     /**
      * Given the current frame and elapsed time, combined with internal animation data, returns the new frame
@@ -115,6 +117,7 @@ class Animation
 {
     AnimationReference animSrc;
     sf::Vector2f position;
+    float rotation;
     unsigned int curFrm, lastFrmChangeTime;
     bool playing, looping, isCenterOrigin;
 
@@ -202,6 +205,13 @@ public:
      * \param pos The desired on screen position
      */
     void setPosition(sf::Vector2f pos);
+
+    /**
+     * Sets the relative rotation of the animation. Individual components' rotations are offset from this
+     *
+     * \param angle Angle of rotation, consistent with SFML coordinate system
+     */
+    void setRotation(float angle);
 
     /**
      * Returns the size of the first frame
