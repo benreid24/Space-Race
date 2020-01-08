@@ -52,6 +52,11 @@ public:
     bool isNumeric(char c);
 
     /**
+     * Helper function to load a true or false. Returns true on success
+     */
+    bool loadBool(bool& value);
+
+    /**
      * Stream to output parsing errors to
      */
     std::ostream& error();

@@ -82,6 +82,43 @@ std::string JsonLoader::loadString() {
     }
 }
 
+bool JsonLoader::loadBool(bool& value) {
+    if (peekNextSymbol() == 't' || peekNextSymbol() == 'f') {
+        std::string word;
+        while (!isWhitespace(data.peek()) && data.good()) {
+            word.push_back(data.get());
+            if (word == "true") {
+                value = true;
+                skipWhitespace();
+                return true;
+            }
+            if (word == "false") {
+                value = false;
+                skipWhitespace();
+                return true;
+            }
+            if (word.size() > 5) {
+                error() << "Expected boolean value but too many characters" << std::endl;
+                valid = false;
+                return false;
+            }
+        }
+        if (data.good()) {
+            error() << "'" << word << "' is not a boolean value" << std::endl;
+            valid = false;
+            return false;
+        }
+    }
+    else {
+        valid = false;
+        error() << "Unexpected character '" << peekNextSymbol() << "'" << std::endl;
+        return false;
+    }
+    valid = false;
+    error() << "Unexpected end of file while parsing boolean" << std::endl;
+    return false;
+}
+
 bool JsonLoader::isNumeric(char c) {
     return isNumber(c) || c == '-';
 }

@@ -21,7 +21,7 @@ public:
      * \param file The data to validate
      * \param strict Whether or not extra fields are considered errors
      */
-    bool validate(const JsonFile& file, bool strict);
+    bool validate(const JsonFile& file, bool strict) const;
 
     /**
      * Returns the schema for the Environment file

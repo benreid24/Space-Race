@@ -36,6 +36,11 @@ private:
 class SchemaValue {
 public:
     /**
+     * Expects to be a boolean value
+     */
+    explicit SchemaValue();
+
+    /**
      * Expect to be a List with the given type and length requirements
      */
     SchemaValue(const SchemaList& list);
@@ -53,7 +58,7 @@ public:
     /**
      * Expect to be a string type, optionally one of a list of valid values
      */
-    SchemaValue(const std::list<std::string>& values = {});
+    SchemaValue(const std::list<std::string>& values);
 
     /**
      * Performs validation on the given JsonValue
@@ -61,12 +66,15 @@ public:
     bool validate(const JsonValue& value, bool strict) const;
 
 private:
+    struct blank {};
+
     const JsonValue::Type type;
     const std::variant<
         SchemaList,
         SchemaGroup,
         std::pair<std::optional<double>, std::optional<double> >,
-        std::list<std::string>
+        std::list<std::string>,
+        blank
     > data;
 };
 

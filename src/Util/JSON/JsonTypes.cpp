@@ -3,6 +3,9 @@
 #include <Util/JSON/JsonLoader.hpp>
 #include <iostream>
 
+JsonValue::JsonValue(bool value)
+: type(Bool), data(value) {}
+
 JsonValue::JsonValue(const std::string& value)
 : type(String), data(value) {}
 
@@ -17,6 +20,10 @@ JsonValue::JsonValue(const JsonGroup& value)
 
 JsonValue::Type JsonValue::getType() const {
     return type;
+}
+
+const bool* JsonValue::getAsBool() const {
+    return std::get_if<bool>(&data);
 }
 
 const std::string* JsonValue::getAsString() const {
@@ -62,6 +69,9 @@ const std::vector<std::string> JsonGroup::getFields() const {
 
 std::ostream& operator<<(std::ostream& stream, const JsonValue::Type& type) {
     switch (type) {
+        case JsonValue::Bool:
+            stream << "Bool";
+            break;
         case JsonValue::String:
             stream << "String";
             break;
@@ -110,6 +120,9 @@ void JsonGroup::print(std::ostream& stream, int ilvl) const {
 
 void JsonValue::print(std::ostream& stream, int ilvl) const {
     switch (getType()) {
+        case Bool:
+            stream << ((*getAsBool()) ? "true" : "false") << ",\n";
+            break;
         case Numeric:
             stream << *getAsNumeric() << ",\n";
             break;
@@ -206,6 +219,15 @@ JsonValue JsonValue::load(JsonLoader& input) {
 
     const JsonSourceInfo info = {input.getFilename(), input.currentLine()};
 
+    if (input.peekNextSymbol() == 'f' || input.peekNextSymbol() == 't') {
+        bool val;
+        if (input.loadBool(val)) {
+            JsonValue value(val);
+            value.source = info;
+            return value;
+        }
+        return errVal;
+    }
     if (input.peekNextSymbol() == '"') {
         JsonValue value(input.loadString());
         value.source = info;

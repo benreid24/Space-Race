@@ -27,6 +27,7 @@ public:
      * \param mass The mass of the entity. Determines gravitational pull and range
      * \param canMove True if moveable and can be affected force/acceleration
      * \param hasGravity Whether or not the Entity emits gravity
+     * \param gRange Optional maximum limit of gravitational range. Calculated from mass by default
      */
     static Ptr create(
         const std::string& name, const std::string& animFile, const sf::Vector2f& position,

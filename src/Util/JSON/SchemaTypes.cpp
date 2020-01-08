@@ -47,6 +47,9 @@ bool SchemaGroup::validate(const JsonGroup& group, bool strict) const {
     return valid;
 }
 
+SchemaValue::SchemaValue()
+: type(JsonValue::Bool), data(blank()) {}
+
 SchemaValue::SchemaValue(const SchemaList& listType)
 : type(JsonValue::List), data(listType) {}
 
@@ -147,6 +150,9 @@ bool SchemaValue::validate(const JsonValue& value, bool strict) const {
             }
         }
         break;
+
+    case JsonValue::Bool:
+        return true;
 
     default:
         error(value.info()) << "SchemaValue errpr: Invalid type " << type << std::endl;

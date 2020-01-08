@@ -60,6 +60,7 @@ private:
 class JsonValue {
 public:
     enum Type {
+        Bool,
         String,
         Numeric,
         Group,
@@ -68,12 +69,14 @@ public:
     };
 
     JsonValue() : type(Unknown) {}
+    JsonValue(bool value);
     JsonValue(double value);
     JsonValue(const std::string& value);
     JsonValue(const JsonList& value);
     JsonValue(const JsonGroup& value);
 
     Type getType() const;
+    const bool* getAsBool() const;
     const std::string* getAsString() const;
     const double* getAsNumeric() const;
     const JsonList* getAsList() const;
@@ -86,7 +89,7 @@ public:
 
 private:
     const Type type;
-    const std::variant<std::string, double, JsonGroup, JsonList> data;
+    const std::variant<bool, std::string, double, JsonGroup, JsonList> data;
     JsonSourceInfo source;
 };
 
