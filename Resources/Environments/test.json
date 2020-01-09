@@ -4,9 +4,9 @@
     "height": 2000,
     "background": {
         "color": {
-            "red": 255,
-            "green": 100,
-            "blue": 100
+            "red": 30,
+            "green": 20,
+            "blue": 15
         }
     },
     "winZone": {

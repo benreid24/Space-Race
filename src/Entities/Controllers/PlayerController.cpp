@@ -4,6 +4,8 @@
 #include <SFML/System.hpp>
 #include <Entities/Entity.hpp>
 #include <Util/AngularVector.hpp>
+#include <Entities/MotionTypes/OrbitalMotion.hpp>
+#include <Entities/MotionTypes/PhysicsMotion.hpp>
 
 EntityController::Ptr PlayerController::create() {
     return EntityController::Ptr(new PlayerController());
@@ -29,4 +31,9 @@ void PlayerController::update(Entity* entity, float dt) {
         entity->applyRotation(120);
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
         entity->applyRotation(-120);
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::C) && entity->currentParentBody())
+        entity->changeMotionType(OrbitalMotion::create(entity->currentParentBody(), entity));
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::V))
+        entity->changeMotionType(PhysicsMotion::create(entity->getPosition(), entity->getVelocity()));
 }

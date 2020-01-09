@@ -15,7 +15,7 @@
 /**
  * Base class for any object that can exist in the Environment
  */
-class Entity : private std::enable_shared_from_this<Entity> {
+class Entity : public std::enable_shared_from_this<Entity> {
 public:
     typedef std::shared_ptr<Entity> Ptr;
 
