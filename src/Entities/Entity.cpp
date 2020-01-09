@@ -3,6 +3,7 @@
 #include <cmath>
 #include <Properties.hpp>
 #include <Util/ResourcePool.hpp>
+#include <Entities/MotionTypes/PhysicsMotion.hpp>
 
 #include <iostream>
 
@@ -19,13 +20,14 @@ Entity::Entity(
 , animation(animSrc, true)
 , rotation(0)
 , rotationRate(0)
-, position(position), velocity(velocity), mass(mass)
+, motion(PhysicsMotion::create(position, velocity))
+, mass(mass)
 , gravitationalRange(gRange <= 0 ? std::sqrt(Properties::GravitationalConstant * mass)/minAccel : gRange)
 , gRangeSqrd(gravitationalRange * gravitationalRange)
 , minGravDist((animation.getSize().x + animation.getSize().y)/2)
 , canMove(canMove), hasGravity(hasGravity)
 {
-    // noop
+    motion->setMotionEnabled(canMove);
 }
 
 Entity::Ptr Entity::create(
@@ -40,18 +42,14 @@ Entity::Ptr Entity::create(
 
 void Entity::update(float dt) {
     customUpdateLogic(dt);
+    animation.update();
 
-    const sf::Vector2f& vi = velocity;
-    position.x += vi.x*dt + acceleration.x*dt*dt/2;
-    position.y += vi.y*dt + acceleration.y*dt*dt/2;
-    velocity += acceleration * dt;
+    motion->update(this, dt);
 
     rotation += rotationRate * dt;
-
     rotationRate = 0;
-    acceleration.x = acceleration.y = 0;
     strongestGravity.magnitude = 0;
-    animation.update();
+    parentBody = nullptr;
 }
 
 const std::string& Entity::getName() const {
@@ -60,14 +58,14 @@ const std::string& Entity::getName() const {
 
 sf::FloatRect Entity::getBoundingBox() const {
     return sf::FloatRect(
-        position - animation.getSize() / 2.0f,
+        motion->getPosition() - animation.getSize() / 2.0f,
         animation.getSize()
     );
 }
 
 float Entity::distanceToSquared(const sf::Vector2f& pos) const {
-    const float dx = position.x - pos.x;
-    const float dy = position.y - pos.y;
+    const float dx = motion->getPosition().x - pos.x;
+    const float dy = motion->getPosition().y - pos.y;
     return dx*dx + dy*dy;
 }
 
@@ -80,15 +78,11 @@ void Entity::applyRotation(float rate) {
 }
 
 const sf::Vector2f& Entity::getPosition() const {
-    return position;
+    return motion->getPosition();
 }
 
 const sf::Vector2f& Entity::getVelocity() const {
-    return velocity;
-}
-
-const sf::Vector2f& Entity::getAcceleration() const {
-    return acceleration;
+    return motion->getVelocity();
 }
 
 float Entity::getMass() const {
@@ -105,8 +99,8 @@ sf::Vector2f Entity::getGravitationalAcceleration(const sf::Vector2f& pos) const
     if (!hasGravity || distanceToSquared(pos) > gRangeSqrd)
         return sf::Vector2f(0, 0);
 
-    const float dx = position.x - pos.x;
-    const float dy = position.y - pos.y;
+    const float dx = motion->getPosition().x - pos.x;
+    const float dy = motion->getPosition().y - pos.y;
     const float angle = std::atan2(dy, dx);
     const float distSqrd = std::max(dx*dx + dy*dy, minGravDist*minGravDist);
     const float accel = Properties::GravitationalConstant * mass / distSqrd;
@@ -121,11 +115,27 @@ sf::Vector2f Entity::getGravitationalAcceleration(Entity::Ptr entity) const {
     return getGravitationalAcceleration(entity->getPosition());
 }
 
-void Entity::applyGravityToEntity(Entity::Ptr entity) const {
+void Entity::applyGravityToEntity(Entity::Ptr entity) {
     if (hasGravity && this != entity.get()) {
-        if (distanceToSquared(entity->getPosition()) <= gRangeSqrd) 
-            entity->applyAcceleration(getGravitationalAcceleration(entity));
+        if (distanceToSquared(entity->getPosition()) <= gRangeSqrd) {
+            const sf::Vector2f gravity = getGravitationalAcceleration(entity);
+            entity->applyAcceleration(gravity);
+            const AngularVectorF rGrav(gravity);
+            if (entity->strongestGravity.magnitude < rGrav.magnitude) {
+                entity->strongestGravity = rGrav;
+                entity->parentBody = shared_from_this();
+            }
+        }
     }
+}
+
+Entity::Ptr Entity::currentParentBody() const {
+    return parentBody;
+}
+
+void Entity::changeMotionType(EntityMotion::Ptr newMotion) {
+    motion = newMotion;
+    motion->setMotionEnabled(canMove);
 }
 
 void Entity::applyForce(const sf::Vector2f& force) {
@@ -133,8 +143,7 @@ void Entity::applyForce(const sf::Vector2f& force) {
 }
 
 void Entity::applyAcceleration(const sf::Vector2f& a) {
-    if (canMove)
-        acceleration += a;
+    motion->applyAcceleration(a);
 }
 
 void Entity::render(sf::RenderTarget& target) {
@@ -142,22 +151,17 @@ void Entity::render(sf::RenderTarget& target) {
         const float gRange = getGravitationalRange();
         const float darkestBlue = 255 - std::min(mass / 10000.0f * 40.0f, 255.0f);
         sf::VertexArray circle(sf::PrimitiveType::TriangleFan, 362);
-        circle[0].position = position;
+        circle[0].position = motion->getPosition();
         circle[0].color = sf::Color(0, 0, darkestBlue, 130);
         for (unsigned int i = 1; i<362; ++i) {
-            circle[i].position.x = position.x + gRange * std::cos(float(i) / 180 * 3.1415);
-            circle[i].position.y = position.y + gRange * std::sin(float(i) / 180 * 3.1415);
+            circle[i].position.x = motion->getPosition().x + gRange * std::cos(float(i) / 180 * 3.1415);
+            circle[i].position.y = motion->getPosition().y + gRange * std::sin(float(i) / 180 * 3.1415);
             circle[i].color = sf::Color(100, 100, 255, 30);
         }
         target.draw(circle);
     }
 
-    animation.setPosition(position);
+    animation.setPosition(motion->getPosition());
     animation.setRotation(rotation);
     animation.draw(target);
-}
-
-void Entity::reset(const sf::Vector2f& pos) {
-    position = pos;
-    velocity = {0, 0};
 }
