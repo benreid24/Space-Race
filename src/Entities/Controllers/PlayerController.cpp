@@ -29,7 +29,4 @@ void PlayerController::update(Entity* entity, float dt) {
         entity->applyRotation(120);
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
         entity->applyRotation(-120);
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace))
-        entity->reset({250, 800});
 }
