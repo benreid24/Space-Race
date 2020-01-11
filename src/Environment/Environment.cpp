@@ -28,6 +28,8 @@ Environment::Environment(const std::string& file) {
     JsonFile input(Properties::EnvironmentFilePath+file);
     if (!JsonSchema::environmentFileSchema().validate(input, true)) {
         std::cerr << "Leaving environment empty on failed load" << std::endl;
+        player = ControllableEntity::createPlayer({0, 0}, {0, 0});
+        entities.push_back(player);
         return;
     }
     const JsonGroup& data = input.getRoot();

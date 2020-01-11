@@ -23,32 +23,34 @@ public:
     /**
      * Expect to be a List with the given type and length requirements
      */
-    SchemaValue(const SchemaList& list);
+    explicit SchemaValue(const SchemaList& list);
 
     /**
      * Expect to be a group with the given structure
      */
-    SchemaValue(const SchemaGroup& group);
+    explicit SchemaValue(const SchemaGroup& group);
 
     /**
      * Expect to be a union of specific values
      */
-    SchemaValue(const SchemaUnion& unionGroup);
+    explicit SchemaValue(const SchemaUnion& unionGroup);
 
     /**
      * Expect to be a numeric type with optional bounds
      */
-    SchemaValue(std::optional<float> minVal, std::optional<float> maxVal);
+    explicit SchemaValue(std::optional<float> minVal, std::optional<float> maxVal);
 
     /**
      * Expect to be a string type, optionally one of a list of valid values
      */
-    SchemaValue(const std::list<std::string>& values);
+    explicit SchemaValue(const std::list<std::string>& values);
 
     /**
      * Performs validation on the given JsonValue
      */
     bool validate(const JsonValue& value, bool strict) const;
+
+    JsonValue::Type getType() const { return type; }
 
 private:
     struct blank {};
@@ -70,9 +72,13 @@ private:
  * Helper struct for list types
  */
 struct SchemaList {
-    SchemaValue listType;
-    std::optional<int> minLen;
-    std::optional<int> maxLen;
+    const SchemaValue listType;
+    const std::optional<int> minLen;
+    const std::optional<int> maxLen;
+
+    explicit SchemaList(const SchemaValue& t) : listType(t) {}
+    explicit SchemaList(const SchemaValue& t, int min) : listType(t), minLen(min) {}
+    explicit SchemaList(const SchemaValue& t, int min, int max) : listType(t), minLen(min), maxLen(max) {}
 };
 
 /**
@@ -80,7 +86,7 @@ struct SchemaList {
  */
 class SchemaGroup {
 public:
-    SchemaGroup(bool overrideStrict = false, bool isStrict = false);
+    explicit SchemaGroup(bool overrideStrict = false, bool isStrict = false);
 
     void addExpectedField(const std::string& name, const SchemaValue& value);
     void addOptionalField(const std::string& name, const SchemaValue& value);
@@ -100,7 +106,7 @@ private:
  */
 class SchemaUnion {
 public:
-    SchemaUnion(unsigned int nFieldsRequired = 1);
+    explicit SchemaUnion(unsigned int nFieldsRequired = 1);
 
     void addFieldOption(const std::string& name, const SchemaValue& value);
 

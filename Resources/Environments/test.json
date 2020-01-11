@@ -4,10 +4,60 @@
     "height": 2000,
     "background": {
         "color": {
-            "red": 30,
-            "green": 20,
-            "blue": 15
-        }
+            "red": 0,
+            "green": 0,
+            "blue": 0
+        },
+        "images": [
+            {
+                "file": "solidback.png",
+                "positioning": {
+                    "fixedSpacing": {
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                "scale": {
+                    "fixed": {
+                        "x": 1,
+                        "y": 1
+                    }
+                }
+            },
+            {
+                "file": "nebula.png",
+                "positioning": {
+                    "rangedSpacing": {
+                        "minx": 100,
+                        "miny": 100,
+                        "maxx": 300,
+                        "maxy": 300
+                    }
+                },
+                "scale": {
+                    "fixed": {
+                        "x": 1,
+                        "y": 1
+                    }
+                }
+            },
+            {
+                "file": "star.png",
+                "positioning": {
+                    "random": {
+                        "density": 0.40
+                    }
+                },
+                "scale": {
+                    "ranged": {
+                        "minx": 0.25,
+                        "maxx": 1.5,
+                        "miny": 0.25,
+                        "maxy": 1.5
+                    }
+                }
+            }
+        ]
     },
     "winZone": {
         "top": 0,

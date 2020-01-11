@@ -57,8 +57,11 @@ bool SchemaGroup::validate(const JsonGroup& group, bool strict) const {
             }
         }
         else {
-            if (!field.value.validate(*group.getField(field.name), beStrict))
+            std::cout << "validate " << field.name << std::endl;
+            if (!field.value.validate(*group.getField(field.name), beStrict)) {
+                error(group.getField(field.name)->info()) << "Field '" << field.name << "' failed to validate" << std::endl;
                 valid = false;
+            }
             auto iter = expectedFields.find(field.name);
             if (iter != expectedFields.end())
                 expectedFields.erase(iter);
@@ -193,20 +196,21 @@ bool SchemaValue::validate(const JsonValue& value, bool strict) const {
 
     case JsonValue::Group: {
             const JsonGroup* val = value.getAsGroup();
+            const SchemaGroup* group = std::get_if<SchemaGroup>(data.get());
+            const SchemaUnion* uGrp = std::get_if<SchemaUnion>(data.get());
             if (val) {
-                const SchemaGroup& schema = *std::get_if<SchemaGroup>(data.get());
-                return schema.validate(*val, strict);
-            }
-            else {
-                const JsonGroup* val = value.getAsGroup();
-                    if (val) {
-                    const SchemaUnion& schema = *std::get_if<SchemaUnion>(data.get());
-                    return schema.validate(*val, strict);
-                }
+                if (group)
+                    return group->validate(*val, strict);
+                else if (uGrp)
+                    return uGrp->validate(*val, strict);
                 else {
-                    error(value.info()) << "JsonValue error: Type is Group but data is not valid" << std::endl;
+                    error(value.info()) << "JsonValue error: Schema object is incorrect type (expect group or union" << std::endl;
                     return false;
                 }
+            }
+            else {
+                error(value.info()) << "JsonValue error: Type is Group but data is not valid" << std::endl;
+                return false;
             }
         }
         break;

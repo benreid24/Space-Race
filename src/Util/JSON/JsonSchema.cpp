@@ -1,6 +1,8 @@
 #include <Util/JSON/JsonSchema.hpp>
 #include <Util/JsonFile.hpp>
 
+#include <iostream>
+
 namespace {
 
 JsonSchema createEnvironmentSchema() {
@@ -24,7 +26,7 @@ JsonSchema createEnvironmentSchema() {
     entityGroup.addExpectedField("hasGravity", boolValue);
     entityGroup.addOptionalField("gravityRange", positiveNumber);
     SchemaValue entityValue(entityGroup);
-    SchemaList entityList = {entityValue}; // no min/max size
+    SchemaList entityList(entityValue);
     SchemaValue entityListValue(entityList);
 
     // Color
@@ -34,10 +36,45 @@ JsonSchema createEnvironmentSchema() {
     colorGroup.addExpectedField("blue", colorNumber);
     SchemaValue colorValue(colorGroup);
 
+    // Generic range
+    SchemaGroup rangeGroup;
+    rangeGroup.addExpectedField("minx", positiveNumber);
+    rangeGroup.addExpectedField("miny", positiveNumber);
+    rangeGroup.addExpectedField("maxx", positiveNumber);
+    rangeGroup.addExpectedField("maxy", positiveNumber);
+    SchemaValue rangeValue(rangeGroup);
+
+    // Image scale
+    SchemaGroup fixedScale;
+    fixedScale.addExpectedField("x", anyNumber);
+    fixedScale.addExpectedField("y", anyNumber);
+    SchemaUnion imageScale;
+    imageScale.addFieldOption("fixed", SchemaValue(fixedScale));
+    imageScale.addFieldOption("ranged", rangeValue);
+    SchemaValue imageScaleValue(imageScale);
+
+    // Image positioning
+    SchemaGroup randomPosGroup;
+    randomPosGroup.addExpectedField("density", SchemaValue(0, 1));
+    SchemaUnion imagePosUnion;
+    imagePosUnion.addFieldOption("random", SchemaValue(randomPosGroup));
+    imagePosUnion.addFieldOption("fixedSpacing", SchemaValue(fixedScale));
+    imagePosUnion.addFieldOption("rangedSpacing", rangeValue);
+    SchemaValue imagePosValue(imagePosUnion);
+
+    // Image list
+    SchemaGroup imageGroup;
+    imageGroup.addExpectedField("file", anyString);
+    imageGroup.addExpectedField("positioning", imagePosValue);
+    imageGroup.addExpectedField("scale", imageScaleValue);
+    SchemaValue imageValue(imageGroup);
+    SchemaList imageList(imageValue);
+    SchemaValue imageListValue(imageList);
+
     // Background
     SchemaGroup backgroundGroup;
     backgroundGroup.addExpectedField("color", colorValue);
-    // TODO - implement "one of" expectation. Separate struct w/ fields. adds to group
+    backgroundGroup.addExpectedField("images", imageListValue);
     SchemaValue backgroundValue(backgroundGroup);
 
     // Player Spawn
