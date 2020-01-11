@@ -77,6 +77,46 @@ bool SchemaGroup::validate(const JsonGroup& group, bool strict) const {
     return valid;
 }
 
+SchemaUnion::SchemaUnion(unsigned int nFields) : nRequiredFields(nFields) {}
+
+void SchemaUnion::addFieldOption(const std::string& name, const SchemaValue& value) {
+    fieldOptions.insert(std::make_pair(name, value));
+}
+
+bool SchemaUnion::validate(const JsonGroup& group, bool strict) const {
+    bool valid = true;
+    const std::vector<std::string> fields = group.getFields();
+
+    if (fields.size() != nRequiredFields) {
+        error(group.info()) << "Expected " << nRequiredFields << " got " << fields.size() << std::endl;
+        valid = false;
+    }
+
+    int found = 0;
+    for (unsigned int i = 0; i<fields.size(); ++i) {
+        const auto iter = fieldOptions.find(fields[i]);
+        if (iter == fieldOptions.end()) {
+            error(group.info()) << "Unexpected field '" << fields[i] << "'\n";
+            valid = false;
+        }
+        else {
+            found += 1;
+            if (!iter->second.validate(*group.getField(fields[i]), strict))
+                valid = false;
+        }
+    }
+
+    if (found != nRequiredFields) {
+        error(group.info()) << nRequiredFields << " fields required from [";
+        for (auto i = fieldOptions.begin(); i!=fieldOptions.end(); ++i)
+            std::cerr << "'" << i->first << "', ";
+        std::cerr << "]. " << found << " are present" << std::endl;
+        valid = false;
+    }
+
+    return valid;
+}
+
 SchemaValue::SchemaValue()
 : type(JsonValue::Bool)
 , data(std::make_shared<TData>(blank())) {}
@@ -88,6 +128,10 @@ SchemaValue::SchemaValue(const SchemaList& listType)
 SchemaValue::SchemaValue(const SchemaGroup& group)
 : type(JsonValue::Group)
 , data(std::make_shared<TData>(group)) {}
+
+SchemaValue::SchemaValue(const SchemaUnion& unionGroup)
+: type(JsonValue::Group)
+, data(std::make_shared<TData>(unionGroup)) {}
 
 SchemaValue::SchemaValue(std::optional<float> minVal, std::optional<float> maxVal)
 : type(JsonValue::Numeric)
@@ -154,8 +198,15 @@ bool SchemaValue::validate(const JsonValue& value, bool strict) const {
                 return schema.validate(*val, strict);
             }
             else {
-                error(value.info()) << "JsonValue error: Type is Group but data is not valid" << std::endl;
-                return false;
+                const JsonGroup* val = value.getAsGroup();
+                    if (val) {
+                    const SchemaUnion& schema = *std::get_if<SchemaUnion>(data.get());
+                    return schema.validate(*val, strict);
+                }
+                else {
+                    error(value.info()) << "JsonValue error: Type is Group but data is not valid" << std::endl;
+                    return false;
+                }
             }
         }
         break;

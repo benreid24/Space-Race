@@ -8,6 +8,7 @@
 
 class SchemaGroup;
 struct SchemaList;
+class SchemaUnion;
 
 /**
  * Object to validate a json value against a schema
@@ -30,6 +31,11 @@ public:
     SchemaValue(const SchemaGroup& group);
 
     /**
+     * Expect to be a union of specific values
+     */
+    SchemaValue(const SchemaUnion& unionGroup);
+
+    /**
      * Expect to be a numeric type with optional bounds
      */
     SchemaValue(std::optional<float> minVal, std::optional<float> maxVal);
@@ -50,6 +56,7 @@ private:
     typedef std::variant<
         SchemaList,
         SchemaGroup,
+        SchemaUnion,
         std::pair<std::optional<float>, std::optional<float> >,
         std::list<std::string>,
         blank
@@ -86,6 +93,22 @@ private:
     const bool overrideStrict;
     const bool isStrict;
     std::vector<std::shared_ptr<Field> > schema;
+};
+
+/**
+ * Specialized group where N field(s) from a list of options must be selected
+ */
+class SchemaUnion {
+public:
+    SchemaUnion(unsigned int nFieldsRequired = 1);
+
+    void addFieldOption(const std::string& name, const SchemaValue& value);
+
+    bool validate(const JsonGroup& group, bool strict) const;
+
+private:
+    const unsigned int nRequiredFields;
+    std::map<std::string, SchemaValue> fieldOptions;
 };
 
 #endif
