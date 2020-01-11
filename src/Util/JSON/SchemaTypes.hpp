@@ -2,33 +2,12 @@
 #define SCHEMATYPES_HPP
 
 #include <Util/JSON/JsonTypes.hpp>
+#include <memory>
 #include <optional>
 #include <list>
 
 class SchemaGroup;
-class SchemaValue;
-
-/**
- * Helper struct for list types
- */
-struct SchemaList {
-    SchemaValue& listType;
-    std::optional<int> minLen;
-    std::optional<int> maxLen;
-};
-
-/**
- * Validates a group of values in json
- */
-class SchemaGroup {
-public:
-    void addExpectedField(const std::string& name, SchemaValue& value);
-
-    bool validate(const JsonGroup& data, bool strict) const;
-
-private:
-    std::vector<std::pair<std::string, SchemaValue&> > schema;
-};
+struct SchemaList;
 
 /**
  * Object to validate a json value against a schema
@@ -68,14 +47,38 @@ public:
 private:
     struct blank {};
 
-    const JsonValue::Type type;
-    const std::variant<
+    typedef std::variant<
         SchemaList,
         SchemaGroup,
         std::pair<std::optional<float>, std::optional<float> >,
         std::list<std::string>,
         blank
-    > data;
+    > TData;
+
+    const JsonValue::Type type;
+    std::shared_ptr<const TData> data;
+};
+
+/**
+ * Helper struct for list types
+ */
+struct SchemaList {
+    SchemaValue listType;
+    std::optional<int> minLen;
+    std::optional<int> maxLen;
+};
+
+/**
+ * Validates a group of values in json
+ */
+class SchemaGroup {
+public:
+    void addExpectedField(const std::string& name, const SchemaValue& value);
+
+    bool validate(const JsonGroup& data, bool strict) const;
+
+private:
+    std::vector<std::pair<std::string, SchemaValue> > schema;
 };
 
 #endif

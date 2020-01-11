@@ -10,15 +10,15 @@ std::ostream& error(const JsonSourceInfo& info) {
 }
 }
 
-void SchemaGroup::addExpectedField(const std::string& name, SchemaValue& value) {
-    schema.push_back(std::pair<std::string, SchemaValue&>(name, value));
+void SchemaGroup::addExpectedField(const std::string& name, const SchemaValue& value) {
+    schema.push_back(std::pair<std::string, SchemaValue>(name, value));
 }
 
 bool SchemaGroup::validate(const JsonGroup& group, bool strict) const {
     bool valid = true;
     std::vector<std::string> fields = group.getFields();
     std::vector<std::string> expectedFields;
-    const auto cb = [&expectedFields] (const std::pair<std::string, SchemaValue&>& val) {
+    const auto cb = [&expectedFields] (const std::pair<std::string, SchemaValue>& val) {
         expectedFields.push_back(val.first);
     };
     std::for_each(schema.begin(), schema.end(), cb);
@@ -48,19 +48,24 @@ bool SchemaGroup::validate(const JsonGroup& group, bool strict) const {
 }
 
 SchemaValue::SchemaValue()
-: type(JsonValue::Bool), data(blank()) {}
+: type(JsonValue::Bool)
+, data(std::make_shared<TData>(blank())) {}
 
 SchemaValue::SchemaValue(const SchemaList& listType)
-: type(JsonValue::List), data(listType) {}
+: type(JsonValue::List)
+, data(std::make_shared<TData>(listType)) {}
 
 SchemaValue::SchemaValue(const SchemaGroup& group)
-: type(JsonValue::Group), data(group) {}
+: type(JsonValue::Group)
+, data(std::make_shared<TData>(group)) {}
 
 SchemaValue::SchemaValue(std::optional<float> minVal, std::optional<float> maxVal)
-: type(JsonValue::Numeric), data(std::make_pair(minVal, maxVal)) {}
+: type(JsonValue::Numeric)
+, data(std::make_shared<TData>(std::make_pair(minVal, maxVal))) {}
 
 SchemaValue::SchemaValue(const std::list<std::string>& values)
-: type(JsonValue::String), data(values) {}
+: type(JsonValue::String)
+, data(std::make_shared<TData>(values)) {}
 
 bool SchemaValue::validate(const JsonValue& value, bool strict) const {
     if (type != value.getType()) {
@@ -72,7 +77,7 @@ bool SchemaValue::validate(const JsonValue& value, bool strict) const {
     case JsonValue::Numeric: {
             const float* val = value.getAsNumeric();
             if (val) {
-                auto limits = *std::get_if<std::pair<std::optional<float>, std::optional<float> > >(&data);
+                auto limits = *std::get_if<std::pair<std::optional<float>, std::optional<float> > >(data.get());
                 if (*val < limits.first.value_or((*val) - 1)) {
                     error(value.info()) << "Numeric JsonValue is too low. Min: " << limits.first.value() << std::endl;
                     return false;
@@ -92,7 +97,7 @@ bool SchemaValue::validate(const JsonValue& value, bool strict) const {
     case JsonValue::String: {
             const std::string* val = value.getAsString();
             if (val) {
-                auto values = *std::get_if<std::list<std::string> >(&data);
+                auto values = *std::get_if<std::list<std::string> >(data.get());
                 if (values.size() > 0) {
                     if (std::find(values.begin(), values.end(), *val) == values.end()) {
                         error(value.info()) << '"' << *val << "' is not a valid String value. Must be in [";
@@ -115,7 +120,7 @@ bool SchemaValue::validate(const JsonValue& value, bool strict) const {
     case JsonValue::Group: {
             const JsonGroup* val = value.getAsGroup();
             if (val) {
-                const SchemaGroup& schema = *std::get_if<SchemaGroup>(&data);
+                const SchemaGroup& schema = *std::get_if<SchemaGroup>(data.get());
                 return schema.validate(*val, strict);
             }
             else {
@@ -129,7 +134,7 @@ bool SchemaValue::validate(const JsonValue& value, bool strict) const {
             const JsonList* val = value.getAsList();
             if (val) {
                 bool valid = true;
-                const SchemaList& schema = *std::get_if<SchemaList>(&data);
+                const SchemaList& schema = *std::get_if<SchemaList>(data.get());
 
                 if (val->size() < schema.minLen.value_or(val->size() - 1)) {
                     error(value.info()) << "List size is too small: Min " << schema.minLen.value() << " actual " << val->size() << std::endl;

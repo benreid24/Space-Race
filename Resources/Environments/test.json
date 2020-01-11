@@ -42,7 +42,7 @@
             "mass": 150000,
             "canMove": false,
             "hasGravity": true,
-            "gravityRange": 230
+            "gravityRange": 0
         }
     ]
 }
