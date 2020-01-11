@@ -30,7 +30,7 @@
             "mass": 10000,
             "canMove": false,
             "hasGravity": true,
-            "gravityRange": 0
+            "gravityRange": 200
         },
         {
             "name": "test entity 2",
@@ -41,8 +41,7 @@
             "vy": 0,
             "mass": 150000,
             "canMove": false,
-            "hasGravity": true,
-            "gravityRange": 0
+            "hasGravity": true
         }
     ]
 }

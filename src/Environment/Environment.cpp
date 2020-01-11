@@ -56,6 +56,9 @@ Environment::Environment(const std::string& file) {
     const JsonList& entityList = *data.getField("entities")->getAsList();
     for (unsigned int i = 0; i<entityList.size(); ++i) {
         const JsonGroup& entity = *entityList[i].getAsGroup();
+        float gRange = 0;
+        if (entity.hasField("gravityRange"))
+            gRange = *entity.getField("gravityRange")->getAsNumeric();
         entities.push_back(Entity::create(
             *entity.getField("name")->getAsString(),
             *entity.getField("gfx")->getAsString(),
@@ -70,7 +73,7 @@ Environment::Environment(const std::string& file) {
             *entity.getField("mass")->getAsNumeric(),
             *entity.getField("canMove")->getAsBool(),
             *entity.getField("hasGravity")->getAsBool(),
-            *entity.getField("gravityRange")->getAsNumeric()
+            gRange
         ));
     }
 }

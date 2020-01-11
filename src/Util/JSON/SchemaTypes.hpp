@@ -73,12 +73,19 @@ struct SchemaList {
  */
 class SchemaGroup {
 public:
+    SchemaGroup(bool overrideStrict = false, bool isStrict = false);
+
     void addExpectedField(const std::string& name, const SchemaValue& value);
+    void addOptionalField(const std::string& name, const SchemaValue& value);
 
     bool validate(const JsonGroup& data, bool strict) const;
 
 private:
-    std::vector<std::pair<std::string, SchemaValue> > schema;
+    struct Field;
+
+    const bool overrideStrict;
+    const bool isStrict;
+    std::vector<std::shared_ptr<Field> > schema;
 };
 
 #endif

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <unordered_set>
 
 namespace {
 std::ostream& error(const JsonSourceInfo& info) {
@@ -10,33 +11,62 @@ std::ostream& error(const JsonSourceInfo& info) {
 }
 }
 
+struct SchemaGroup::Field {
+    const std::string name;
+    const SchemaValue value;
+    const bool required;
+
+    Field(const std::string& name, const SchemaValue& value, bool required)
+        : name(name), value(value), required(required) {}
+};
+
+SchemaGroup::SchemaGroup(bool overrideStrict, bool isStrict)
+: overrideStrict(overrideStrict), isStrict(isStrict) {}
+
 void SchemaGroup::addExpectedField(const std::string& name, const SchemaValue& value) {
-    schema.push_back(std::pair<std::string, SchemaValue>(name, value));
+    schema.push_back(std::make_shared<Field>(name, value, true));
+}
+
+void SchemaGroup::addOptionalField(const std::string& name, const SchemaValue& value) {
+    schema.push_back(std::make_shared<Field>(name, value, false));
 }
 
 bool SchemaGroup::validate(const JsonGroup& group, bool strict) const {
+    const bool beStrict = overrideStrict ? isStrict : strict;
+
     bool valid = true;
     std::vector<std::string> fields = group.getFields();
-    std::vector<std::string> expectedFields;
-    const auto cb = [&expectedFields] (const std::pair<std::string, SchemaValue>& val) {
-        expectedFields.push_back(val.first);
+    std::unordered_set<std::string> expectedFields;
+    std::unordered_set<std::string> optionalFields;
+
+    const auto cb = [&expectedFields, &optionalFields] (const std::shared_ptr<Field>& ptr) {
+        const Field& val = *ptr;
+        if (val.required)
+            expectedFields.insert(val.name);
+        else
+            optionalFields.insert(val.name);
     };
     std::for_each(schema.begin(), schema.end(), cb);
 
-    for (auto field : schema) {
-        if (!group.hasField(field.first)) {
-            error(group.info()) << "JsonGroup is missing field: " << field.first << std::endl;
-            valid = false;
+    for (auto fieldPtr : schema) {
+        const Field& field = *fieldPtr;
+        if (!group.hasField(field.name)) {
+            if (optionalFields.find(field.name) == optionalFields.end()) {
+                error(group.info()) << "JsonGroup is missing field: " << field.name << std::endl;
+                valid = false;
+            }
         }
         else {
-            if (!field.second.validate(*group.getField(field.first), strict))
+            if (!field.value.validate(*group.getField(field.name), beStrict))
                 valid = false;
-            expectedFields.erase(std::find(expectedFields.begin(), expectedFields.end(), field.first));
-            fields.erase(std::find(fields.begin(), fields.end(), field.first));
+            auto iter = expectedFields.find(field.name);
+            if (iter != expectedFields.end())
+                expectedFields.erase(iter);
+            fields.erase(std::find(fields.begin(), fields.end(), field.name));
         }
     }
 
-    if (strict && fields.size() > 0) {
+    if (beStrict && fields.size() > 0) {
         error(group.info()) << "JsonGroup has extra fields: ";
         for (const std::string& field : fields)
             std::cerr << field << ", ";
