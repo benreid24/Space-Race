@@ -52,29 +52,9 @@ Environment::Environment(const std::string& file) {
     );
     entities.push_back(player);
 
-    // TODO - update Entity ctor to take JsonGroup
     const JsonList& entityList = *data.getField("entities")->getAsList();
     for (unsigned int i = 0; i<entityList.size(); ++i) {
-        const JsonGroup& entity = *entityList[i].getAsGroup();
-        float gRange = 0;
-        if (entity.hasField("gravityRange"))
-            gRange = *entity.getField("gravityRange")->getAsNumeric();
-        entities.push_back(Entity::create(
-            *entity.getField("name")->getAsString(),
-            *entity.getField("gfx")->getAsString(),
-            {
-                *entity.getField("x")->getAsNumeric(),
-                *entity.getField("y")->getAsNumeric()
-            },
-            {
-                *entity.getField("vx")->getAsNumeric(),
-                *entity.getField("vy")->getAsNumeric()
-            },
-            *entity.getField("mass")->getAsNumeric(),
-            *entity.getField("canMove")->getAsBool(),
-            *entity.getField("hasGravity")->getAsBool(),
-            gRange
-        ));
+        entities.push_back(Entity::create(*entityList[i].getAsGroup()));
     }
 
     background.load(*data.getField("background")->getAsGroup());

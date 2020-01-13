@@ -3,6 +3,7 @@
 #include <cmath>
 #include <Properties.hpp>
 #include <Util/ResourcePool.hpp>
+#include <Util/Schemas.hpp>
 #include <Entities/MotionTypes/PhysicsMotion.hpp>
 
 #include <iostream>
@@ -38,6 +39,31 @@ Entity::Ptr Entity::create(
     return Entity::Ptr(new Entity(
         name, animFile, position, velocity, mass, canMove, hasGravity, gRange
     ));
+}
+
+Entity::Ptr Entity::create(const JsonGroup& data) {
+    if (!Schemas::entitySchema().validate(data, true))
+        return nullptr;
+
+    float gRange = 0;
+    if (data.hasField("gravityRange"))
+        gRange = *data.getField("gravityRange")->getAsNumeric();
+    return Entity::create(
+        *data.getField("name")->getAsString(),
+        *data.getField("gfx")->getAsString(),
+        {
+            *data.getField("x")->getAsNumeric(),
+            *data.getField("y")->getAsNumeric()
+        },
+        {
+            *data.getField("vx")->getAsNumeric(),
+            *data.getField("vy")->getAsNumeric()
+        },
+        *data.getField("mass")->getAsNumeric(),
+        *data.getField("canMove")->getAsBool(),
+        *data.getField("hasGravity")->getAsBool(),
+        gRange
+    );
 }
 
 void Entity::update(float dt) {
