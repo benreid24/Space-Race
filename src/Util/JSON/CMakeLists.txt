@@ -4,7 +4,6 @@ target_sources(SpaceRace PUBLIC
     JsonTypes.hpp
     JsonTypes.cpp
     JsonSchema.hpp
-    JsonSchema.cpp
     SchemaTypes.hpp
     SchemaTypes.cpp
 )

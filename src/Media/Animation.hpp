@@ -28,12 +28,6 @@ struct AnimationFrame
  */
 class AnimationSource
 {
-    TextureReference sheet;
-    std::vector<std::vector<AnimationFrame> > frames;
-    bool loop;
-    std::vector<sf::Sprite> sprites;
-    std::string spriteSheetFile;
-
 public:
     /**
      * Creates an empty animation
@@ -72,12 +66,14 @@ public:
      *
      * \param i The index of the frame to return
      * \param pos The desired on screen position of the animation
+     * \param scale Scale modifier to apply to all pieces
      * \param rotation Rotation angle offset in degrees
      * \param centerOrigin Whether or not to center the origin when offsetting
      * \return A vector of Sprite objects that are ready to be rendered
      */
-    const std::vector<sf::Sprite>& getFrame(unsigned int i, sf::Vector2f pos,
-                                            float rotation, bool centerOrigin);
+    const std::vector<sf::Sprite>& getFrame(unsigned int i, const sf::Vector2f& pos,
+                                            const sf::Vector2f& scale, float rotation,
+                                            bool centerOrigin);
 
     /**
      * Given the current frame and elapsed time, combined with internal animation data, returns the new frame
@@ -109,18 +105,19 @@ public:
 	 * Returns whether or not the spritesheet was found
 	 */
     bool spritesheetFound() const;
+
+private:
+    TextureReference sheet;
+    std::vector<std::vector<AnimationFrame> > frames;
+    bool loop;
+    std::vector<sf::Sprite> sprites;
+    std::string spriteSheetFile;
 };
 
 typedef std::shared_ptr<AnimationSource> AnimationReference;
 
 class Animation
 {
-    AnimationReference animSrc;
-    sf::Vector2f position;
-    float rotation;
-    unsigned int curFrm, lastFrmChangeTime;
-    bool playing, looping, isCenterOrigin;
-
 public:
     /**
      * Creates an empty animation
@@ -151,14 +148,14 @@ public:
     /**
      * Updates the animation. Sets the proper frame based on elapsed time since the last call to update
      */
-    void update();
+    void update() const;
 
     /**
      * Sets the current frame to the given frame and resets the internal timer
      *
      * \param frm The index of the frame to make current
      */
-    void setFrame(unsigned int frm);
+    void setFrame(unsigned int frm) const;
 
     /**
      * Tells whether or not the animation has finished playing
@@ -207,6 +204,12 @@ public:
     void setPosition(sf::Vector2f pos);
 
     /**
+     * Sets the scale to apply to all components of the Animation
+     * \param scale The scale to apply
+     */
+    void setScale(const sf::Vector2f& scale);
+
+    /**
      * Sets the relative rotation of the animation. Individual components' rotations are offset from this
      *
      * \param angle Angle of rotation, consistent with SFML coordinate system
@@ -223,7 +226,16 @@ public:
      *
      * \param window A pointer to the window to render to
      */
-    void draw(sf::RenderTarget& window);
+    void draw(sf::RenderTarget& window) const;
+
+private:
+    AnimationReference animSrc;
+    sf::Vector2f position, scale;
+    float rotation;
+    bool looping, isCenterOrigin;
+
+    mutable unsigned int curFrm, lastFrmChangeTime;
+    mutable bool playing;
 };
 
 #endif // ANIMATION_HPP

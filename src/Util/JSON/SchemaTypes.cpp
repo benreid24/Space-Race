@@ -4,6 +4,12 @@
 #include <algorithm>
 #include <unordered_set>
 
+const SchemaValue SchemaValue::anyString(std::list<std::string>(0));
+const SchemaValue SchemaValue::anyBool;
+const SchemaValue SchemaValue::anyNumber({}, {});
+const SchemaValue SchemaValue::negativeNumber({}, 0);
+const SchemaValue SchemaValue::positiveNumber(0, {});
+
 namespace {
 std::ostream& error(const JsonSourceInfo& info) {
     std::cerr << "File " << info.filename << " line " << info.lineNumber << ": ";
@@ -57,7 +63,6 @@ bool SchemaGroup::validate(const JsonGroup& group, bool strict) const {
             }
         }
         else {
-            std::cout << "validate " << field.name << std::endl;
             if (!field.value.validate(*group.getField(field.name), beStrict)) {
                 error(group.getField(field.name)->info()) << "Field '" << field.name << "' failed to validate" << std::endl;
                 valid = false;

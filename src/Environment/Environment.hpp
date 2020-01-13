@@ -2,6 +2,7 @@
 #define ENVIRONMENT_HPP
 
 #include <Entities/Entity.hpp>
+#include <Environment/Background.hpp>
 
 /**
  * Represents a playable level and all entities within
@@ -44,10 +45,13 @@ private:
     sf::View camera;
 
     std::string name;
-    sf::Color background;
+    sf::FloatRect victoryRegion;
+    sf::FloatRect bounds;
+
+    Background background;
+
     std::vector<Entity::Ptr> entities;
     Entity::Ptr player;
-    sf::FloatRect victoryRegion;
 };
 
 #endif

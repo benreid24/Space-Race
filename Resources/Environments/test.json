@@ -8,7 +8,7 @@
             "green": 0,
             "blue": 0
         },
-        "images": [
+        "elements": [
             {
                 "file": "solidback.png",
                 "positioning": {
@@ -45,7 +45,7 @@
                 "file": "star.png",
                 "positioning": {
                     "random": {
-                        "density": 0.40
+                        "density": 0.20
                     }
                 },
                 "scale": {
@@ -66,8 +66,8 @@
         "height": 300
     },
     "playerSpawn": {
-        "x": 50,
-        "y": 500
+        "x": 1000,
+        "y": 1000
     },
     "entities": [
         {

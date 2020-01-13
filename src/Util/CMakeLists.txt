@@ -7,6 +7,8 @@ target_sources(SpaceRace PUBLIC
     ResourcePool.hpp
     ResourcePool.cpp
     ResourceTypes.hpp
+    Schemas.hpp
+    Schemas.cpp
     Timer.hpp
     Timer.cpp
     Util.hpp

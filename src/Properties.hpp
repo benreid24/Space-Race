@@ -22,9 +22,11 @@ public:
     static const std::string GameSavePath;
 
     static const std::string EnvironmentFilePath;
+    static const std::string EnvironmentImagePath;
+    static const std::string EnvironmentAnimPath;
     
     static const std::string EntityAnimationPath;
-    static const std::string SpriteSheetPath;
+    static const std::string EntityImagePath;
 
     static const std::string ScriptPath;
     static const std::string ScriptExtension;
@@ -32,6 +34,9 @@ public:
     static const std::string PlaylistPath;
     static const std::string MusicPath;
     static const std::string AudioPath;
+
+    static const std::string AnimationExtension;
+    static const std::string SpriteSheetPath;
 
     static sf::Font PrimaryFont;
 };

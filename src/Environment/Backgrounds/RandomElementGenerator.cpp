@@ -1,0 +1,29 @@
+#include <Environment/Backgrounds/RandomElementGenerator.hpp>
+#include <Util/Util.hpp>
+
+#include <iostream>
+
+RandomElementGenerator::RandomElementGenerator(const std::string& gfx, float density,
+    const sf::Vector2f& minScale, const sf::Vector2f& maxScale)
+: BackgroundElementGenerator(gfx, minScale, maxScale), density(density) {}
+
+BackgroundElementGenerator::ElementBucket RandomElementGenerator::generate(const sf::FloatRect& region) {
+    BackgroundElementGenerator::ElementBucket elements;
+    const float eArea = getElementSize().x * getElementSize().y;
+    const float gArea = region.width * region.height;
+    const unsigned int n = gArea / eArea * density;
+
+    std::cout << "Generating region (" << region.left << ", " << region.top << ")\n";
+
+    for (unsigned int i = 0; i<n; ++i) {
+        elements.push_back({
+            {
+                randomFloat(region.left, region.left + region.width),
+                randomFloat(region.top, region.top + region.height)
+            },
+            getElementScale()
+        });
+    }
+
+    return elements;
+}

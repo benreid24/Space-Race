@@ -15,10 +15,11 @@ class SchemaUnion;
  */
 class SchemaValue {
 public:
-    /**
-     * Expects to be a boolean value
-     */
-    explicit SchemaValue();
+    static const SchemaValue anyString;
+    static const SchemaValue anyNumber;
+    static const SchemaValue positiveNumber;
+    static const SchemaValue negativeNumber;
+    static const SchemaValue anyBool;
 
     /**
      * Expect to be a List with the given type and length requirements
@@ -53,6 +54,11 @@ public:
     JsonValue::Type getType() const { return type; }
 
 private:
+    /**
+     * Expects to be a boolean value
+     */
+    explicit SchemaValue();
+
     struct blank {};
 
     typedef std::variant<

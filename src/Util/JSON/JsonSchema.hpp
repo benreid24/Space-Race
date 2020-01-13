@@ -2,8 +2,7 @@
 #define JSONSCHEMA_HPP
 
 #include <Util/JSON/SchemaTypes.hpp>
-
-class JsonFile;
+#include <Util/JsonFile.hpp>
 
 /**
  * Validates a JsonFile object by defining a schema for it
@@ -13,7 +12,12 @@ public:
     /**
      * Defines a schema with the given root group object
      */
-    JsonSchema(const SchemaGroup& root);
+    JsonSchema(const SchemaGroup& root) : root(root) {}
+
+    /**
+     * Returns the root object
+     */
+    const SchemaGroup& getRoot() const { return root; }
 
     /**
      * Validates the given JsonFile
@@ -21,12 +25,15 @@ public:
      * \param file The data to validate
      * \param strict Whether or not extra fields are considered errors
      */
-    bool validate(const JsonFile& file, bool strict) const;
+    bool validate(const JsonFile& file, bool strict) const { return root.validate(file.getRoot(), strict); }
 
     /**
-     * Returns the schema for the Environment file
+     * Validates the given JsonGroup
+     * 
+     * \param data The data to validate
+     * \param strict Whether or not extra fields are considered errors
      */
-    static const JsonSchema& environmentFileSchema();
+    bool validate(const JsonGroup& data, bool strict) const { return root.validate(data, strict); }
 
 private:
     const SchemaGroup root;
