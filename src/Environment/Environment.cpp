@@ -4,11 +4,10 @@
 #include <Properties.hpp>
 #include <Entities/ControllableEntity.hpp>
 #include <Util/JsonFile.hpp>
-#include <Util/JSON/JsonSchema.hpp>
+#include <Util/Schemas.hpp>
 
 Environment::Environment() {
     camera.setSize(Properties::ScreenWidth, Properties::ScreenHeight);
-    background = sf::Color::Black;
     victoryRegion = {0, 0, 800, 100};
     player = ControllableEntity::createPlayer({250, 800}, {0, 0});
     entities.push_back(player);
@@ -26,8 +25,10 @@ Environment::Environment() {
 
 Environment::Environment(const std::string& file) {
     JsonFile input(Properties::EnvironmentFilePath+file);
-    if (!JsonSchema::environmentFileSchema().validate(input, true)) {
+    if (!Schemas::environmentFileSchema().validate(input, true)) {
         std::cerr << "Leaving environment empty on failed load" << std::endl;
+        player = ControllableEntity::createPlayer({0, 0}, {0, 0});
+        entities.push_back(player);
         return;
     }
     const JsonGroup& data = input.getRoot();
@@ -37,11 +38,9 @@ Environment::Environment(const std::string& file) {
     victoryRegion.left = *data.getField("winZone")->getAsGroup()->getField("left")->getAsNumeric();
     victoryRegion.width = *data.getField("winZone")->getAsGroup()->getField("width")->getAsNumeric();
     victoryRegion.height = *data.getField("winZone")->getAsGroup()->getField("height")->getAsNumeric();
-
-    const JsonGroup& color = *data.getField("background")->getAsGroup()->getField("color")->getAsGroup();
-    background.r = *color.getField("red")->getAsNumeric();
-    background.g = *color.getField("green")->getAsNumeric();
-    background.b = *color.getField("blue")->getAsNumeric();
+    bounds.left = bounds.top = 0;
+    bounds.width = *data.getField("width")->getAsNumeric();
+    bounds.height = *data.getField("height")->getAsNumeric();
 
     const JsonGroup& spawn = *data.getField("playerSpawn")->getAsGroup();
     player = ControllableEntity::createPlayer(
@@ -55,41 +54,33 @@ Environment::Environment(const std::string& file) {
 
     const JsonList& entityList = *data.getField("entities")->getAsList();
     for (unsigned int i = 0; i<entityList.size(); ++i) {
-        const JsonGroup& entity = *entityList[i].getAsGroup();
-        entities.push_back(Entity::create(
-            *entity.getField("name")->getAsString(),
-            *entity.getField("gfx")->getAsString(),
-            {
-                *entity.getField("x")->getAsNumeric(),
-                *entity.getField("y")->getAsNumeric()
-            },
-            {
-                *entity.getField("vx")->getAsNumeric(),
-                *entity.getField("vy")->getAsNumeric()
-            },
-            *entity.getField("mass")->getAsNumeric(),
-            *entity.getField("canMove")->getAsBool(),
-            *entity.getField("hasGravity")->getAsBool(),
-            *entity.getField("gravityRange")->getAsNumeric()
-        ));
+        entities.push_back(Entity::create(*entityList[i].getAsGroup()));
     }
+
+    background.load(*data.getField("background")->getAsGroup());
 }
 
 void Environment::update(float dt) {
+    const sf::FloatRect region(
+        camera.getCenter() - camera.getSize()/2.0f,
+        camera.getSize()
+    );
+    background.update(region);
     for (Entity::Ptr entity : entities) {
         for (Entity::Ptr gravEnt : entities) {
             gravEnt->applyGravityToEntity(entity);
         }
         entity->update(dt);
     }
+
+    camera.setCenter(player->getPosition());
+    camera.setRotation(player->getRotation());
 }
 
 void Environment::render(sf::RenderTarget& target) {
-    camera.setCenter(player->getPosition());
-    camera.setRotation(player->getRotation());
     target.setView(camera);
 
-    target.clear(background);
+    background.render(target);
 
     sf::RectangleShape rect({victoryRegion.width, victoryRegion.height});
     rect.setPosition({victoryRegion.left, victoryRegion.top});

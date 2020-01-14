@@ -67,7 +67,7 @@ bool AnimationSource::isLooping() const
 }
 
 const std::vector<sf::Sprite>& AnimationSource::getFrame(
-    unsigned int i, Vector2f pos, float rot, bool centerOrigin)
+    unsigned int i, const Vector2f& pos, const Vector2f& scale, float rot, bool centerOrigin)
 {
     if (i>=frames.size() || !sheet) {
         return sprites;
@@ -81,7 +81,7 @@ const std::vector<sf::Sprite>& AnimationSource::getFrame(
     	sp.setTextureRect(IntRect(frames[i][j].sourcePos.x, frames[i][j].sourcePos.y, frames[i][j].size.x, frames[i][j].size.y));
 		sp.setOrigin(frames[i][j].size.x/2,frames[i][j].size.y/2);
 		sp.setColor(Color(255,255,255,frames[i][j].alpha));
-		sp.setScale(frames[i][j].scaleX,frames[i][j].scaleY);
+		sp.setScale(frames[i][j].scaleX * scale.x, frames[i][j].scaleY * scale.y);
 		sf::Vector2f offset = Vector2f(sp.getGlobalBounds().width/2,sp.getGlobalBounds().height/2) - sp.getOrigin();
 		if (!centerOrigin)
             offset = -sp.getOrigin();
@@ -97,7 +97,7 @@ sf::Vector2f AnimationSource::getFrameSize(unsigned int n) {
         return Vector2f(0,0);
 
     sf::FloatRect bounds(0, 0, 0, 0); //width/height = right/bottom
-    const vector<Sprite>& pieces = getFrame(n, Vector2f(0,0), 0, false);
+    const vector<Sprite>& pieces = getFrame(n, Vector2f(0,0), Vector2f(1,1), 0, false);
 
     for (unsigned int i = 0; i<pieces.size(); ++i) {
         FloatRect pb = pieces[i].getGlobalBounds();
@@ -153,7 +153,7 @@ bool AnimationSource::spritesheetFound() const {
     return sheet.get() != nullptr;
 }
 
-Animation::Animation()
+Animation::Animation() : scale(1,1)
 {
     rotation = 0;
     curFrm = lastFrmChangeTime = 0;
@@ -187,7 +187,7 @@ void Animation::setSource(AnimationReference src, bool co)
     isCenterOrigin = co;
 }
 
-void Animation::update()
+void Animation::update() const
 {
     if (!animSrc)
         return;
@@ -207,7 +207,7 @@ void Animation::update()
     }
 }
 
-void Animation::setFrame(unsigned int frm)
+void Animation::setFrame(unsigned int frm) const
 {
     curFrm = frm;
     lastFrmChangeTime = Timer::get().timeElapsedMilliseconds();
@@ -230,7 +230,7 @@ Vector2f Animation::getSize() const {
 	Vector2f zero(0,0);
 	if (!animSrc)
         return zero;
-	vector<Sprite> frames = animSrc->getFrame(0, zero, 0, isCenterOrigin);
+	vector<Sprite> frames = animSrc->getFrame(0, zero, scale, 0, isCenterOrigin);
 	if (frames.size()==0)
 		return zero;
 	return Vector2f(frames[0].getGlobalBounds().width, frames[0].getGlobalBounds().height);
@@ -262,17 +262,21 @@ void Animation::setPosition(Vector2f pos)
     position = pos;
 }
 
+void Animation::setScale(const Vector2f& s) {
+    scale = s;
+}
+
 void Animation::setRotation(float angle) {
     rotation = angle;
 }
 
-void Animation::draw(sf::RenderTarget& window)
+void Animation::draw(sf::RenderTarget& window) const
 {
     if (!animSrc)
         return;
 
     update();
-    const std::vector<Sprite>& t = animSrc->getFrame(curFrm, position, rotation, isCenterOrigin);
+    const std::vector<Sprite>& t = animSrc->getFrame(curFrm, position, scale, rotation, isCenterOrigin);
     for (unsigned int i = 0; i<t.size(); ++i)
 		window.draw(t[i]);
 }

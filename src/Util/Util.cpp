@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iostream>
 #include <random>
+#include <limits>
 using namespace std;
 
 namespace {
@@ -16,6 +17,15 @@ int randomInt(int mn, int mx) {
 		std::swap(mn,mx);
     std::uniform_int_distribution<std::mt19937::result_type> dist(mn,mx);
 	return dist(rng);
+}
+
+float randomFloat(float mn, float mx) {
+    if (mn > mx)
+        std::swap(mn, mx);
+    const int mr = std::numeric_limits<int>::max() - 1;
+    const float r = randomInt(0, mr);
+    const float scaled = r / static_cast<float>(mr) * (mx - mn);
+    return mn + scaled;
 }
 
 string intToString(int i)

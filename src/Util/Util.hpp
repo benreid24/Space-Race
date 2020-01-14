@@ -5,6 +5,8 @@
 
 int randomInt(int mn, int mx);
 
+float randomFloat(float mn, float mx);
+
 std::string intToString(int i);
 
 std::string doubleToString(double d);

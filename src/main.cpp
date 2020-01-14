@@ -1,5 +1,6 @@
 #include <Environment/Environment.hpp>
 #include <Util/Timer.hpp>
+#include <Util/Util.hpp>
 #include <Properties.hpp>
 
 #include <cstdlib>
@@ -21,6 +22,15 @@ int main() {
     float lastPhysicsTime = Timer::get().timeElapsedSeconds();
     float lastRenderTime = Timer::get().timeElapsedSeconds();
 
+    float fps = 60;
+    sf::Text fpsText;
+    fpsText.setFont(Properties::PrimaryFont);
+    fpsText.setFillColor(sf::Color::Red);
+    fpsText.setCharacterSize(18);
+    fpsText.setOutlineColor(sf::Color::White);
+    fpsText.setOutlineThickness(1);
+    fpsText.setPosition({10,10});
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -34,6 +44,12 @@ int main() {
 
         if (Timer::get().timeElapsedSeconds() - lastRenderTime >= renderTimeGap) {
             environment.render(window);
+
+            fps = 0.9 * fps + 0.1 / (Timer::get().timeElapsedSeconds() - lastRenderTime);
+            fpsText.setString("FPS: " + intToString(fps));
+            window.setView(window.getDefaultView());
+            window.draw(fpsText);
+            
             window.display();
             lastRenderTime = Timer::get().timeElapsedSeconds();
         }

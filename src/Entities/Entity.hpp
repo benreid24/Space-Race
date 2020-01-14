@@ -11,6 +11,7 @@
 #include <Media/Animation.hpp>
 #include <Util/ResourceTypes.hpp>
 #include <Util/AngularVector.hpp>
+#include <Util/JsonFile.hpp>
 
 /**
  * Base class for any object that can exist in the Environment
@@ -35,6 +36,11 @@ public:
         const std::string& name, const std::string& animFile, const sf::Vector2f& position,
         const sf::Vector2f& velocity, float mass, bool canMove, bool hasGravity, float gRange = -1
     );
+
+    /**
+     * Creates an Entity from json data
+     */
+    static Ptr create(const JsonGroup& data);
 
     virtual ~Entity() = default;
 
