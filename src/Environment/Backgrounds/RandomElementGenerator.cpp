@@ -1,9 +1,10 @@
 #include <Environment/Backgrounds/RandomElementGenerator.hpp>
 #include <Util/Util.hpp>
 
-RandomElementGenerator::RandomElementGenerator(const std::string& gfx, float density,
+RandomElementGenerator::RandomElementGenerator(
+    const std::string& gfx, float density, bool preserveAR,
     const sf::Vector2f& minScale, const sf::Vector2f& maxScale)
-: BackgroundElementGenerator(gfx, minScale, maxScale), density(density) {}
+: BackgroundElementGenerator(gfx, preserveAR, minScale, maxScale), density(density) {}
 
 BackgroundElementGenerator::ElementBucket RandomElementGenerator::generate(const sf::FloatRect& region) {
     BackgroundElementGenerator::ElementBucket elements;

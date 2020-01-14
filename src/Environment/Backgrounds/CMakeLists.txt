@@ -5,4 +5,6 @@ target_sources(SpaceRace PUBLIC
     ElementGeneratorFactory.cpp
     RandomElementGenerator.hpp
     RandomElementGenerator.cpp
+    SpacedElementGenerator.hpp
+    SpacedElementGenerator.cpp
 )

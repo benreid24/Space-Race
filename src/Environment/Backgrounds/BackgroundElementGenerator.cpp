@@ -6,11 +6,11 @@
 #include <iostream>
 
 namespace {
-constexpr int   keySkew          = 100000;
-constexpr float cleanPeriod      = 10.0;
-constexpr int   bucketSize       = 1000;
-constexpr int   maxRenderBuckets = 10;
-constexpr int   lowRenderInc     = 4;
+constexpr int   keySkew           = 100000;
+constexpr float cleanPeriod       = 10.0;
+constexpr int   bucketSize        = 1000;
+constexpr int   maxRenderBuckets  = 10;
+constexpr int   lowRenderInc      = 4;
 }
 
 bool BackgroundElementGenerator::BucketKeyCmp::operator()(
@@ -32,13 +32,13 @@ BackgroundElementGenerator::BucketKey::operator sf::FloatRect() const {
     return {
         static_cast<float>(x) * bucketSize,
         static_cast<float>(y) * bucketSize,
-        bucketSize,
-        bucketSize
+        static_cast<float>(bucketSize),
+        static_cast<float>(bucketSize)
     };
 }
 
-std::vector<BackgroundElementGenerator::BucketKey> BackgroundElementGenerator::BucketKey::gen(
-                                                                    const sf::FloatRect& region) {
+std::vector<BackgroundElementGenerator::BucketKey>
+    BackgroundElementGenerator::BucketKey::gen(const sf::FloatRect& region) {
     const int x = std::floor(region.left / static_cast<float>(bucketSize)) - 1;
     const int y = std::floor(region.top / static_cast<float>(bucketSize)) - 1;
     const int w = std::ceil(region.width / static_cast<float>(bucketSize)) + 1;
@@ -56,9 +56,14 @@ std::vector<BackgroundElementGenerator::BucketKey> BackgroundElementGenerator::B
     return keys;
 }
 
-BackgroundElementGenerator::BackgroundElementGenerator(const std::string& file, const sf::Vector2f& minScale, const sf::Vector2f& maxScale)
+BackgroundElementGenerator::BackgroundElementGenerator(const std::string& file, bool preserveAR,
+    const sf::Vector2f& minScale, const sf::Vector2f& maxScale)
 : gfx(Properties::EnvironmentImagePath, Properties::EnvironmentAnimPath, file, false)
-, minScale(minScale), maxScale(maxScale) {
+, preserveAspectRatio(preserveAR)
+, canFlipH(minScale.x < 0)
+, canFlipV(minScale.y < 0)
+, minScale(std::abs(minScale.x), std::abs(minScale.y))
+, maxScale(maxScale) {
     gfx.setScale(maxScale);
     maxGfxSize = gfx.getSize();
 }
@@ -88,10 +93,15 @@ const sf::Vector2f& BackgroundElementGenerator::getElementSize() const {
 }
 
 sf::Vector2f BackgroundElementGenerator::getElementScale() const {
-    return {
-        randomFloat(minScale.x, maxScale.x),
-        randomFloat(minScale.y, maxScale.y)
-    };
+    float x = randomFloat(minScale.x, maxScale.x);
+    if (canFlipH && randomFloat(0, 1) <= 0.5)
+        x *= -1;
+    float y = randomFloat(minScale.x, minScale.y);
+    if (canFlipV && randomFloat(0, 1) <= 0.5)
+        y *= -1;
+    if (preserveAspectRatio)
+        y = x;
+    return {x, y};
 }
 
 void BackgroundElementGenerator::render(sf::RenderTarget& target) {
@@ -100,7 +110,7 @@ void BackgroundElementGenerator::render(sf::RenderTarget& target) {
         target.getView().getSize()
     );
     const std::vector<BucketKey> keys = BucketKey::gen(region);
-    if (keys.size() <= maxRenderBuckets) {
+    if (keys.size() <= maxRenderBuckets || true) {
         //proper render
         for (unsigned int i = 0; i<keys.size(); ++i) {
             auto bucket = buckets.find(keys[i]);

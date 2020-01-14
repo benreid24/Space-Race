@@ -9,7 +9,7 @@ struct ElementGeneratorFactory;
  * Generates elements randomly with a given density
  */
 class RandomElementGenerator : public BackgroundElementGenerator {
-    RandomElementGenerator(const std::string& gfx, float density,
+    RandomElementGenerator(const std::string& gfx, float density, bool preserveAR,
         const sf::Vector2f& minScale, const sf::Vector2f& maxScale);
 
     virtual BackgroundElementGenerator::ElementBucket generate(const sf::FloatRect& region) override;

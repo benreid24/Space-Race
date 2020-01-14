@@ -23,7 +23,7 @@ protected:
     };
     typedef std::vector<Element> ElementBucket;
 
-    BackgroundElementGenerator(const std::string& file,
+    BackgroundElementGenerator(const std::string& file, bool preserveAR,
         const sf::Vector2f& minScale, const sf::Vector2f& maxScale);
 
     /**
@@ -53,6 +53,9 @@ private:
     std::map<BucketKey, ElementBucket, BucketKeyCmp> buckets;
 
     GraphicsWrapper gfx;
+    const bool preserveAspectRatio;
+    const bool canFlipH;
+    const bool canFlipV;
     const sf::Vector2f minScale;
     const sf::Vector2f maxScale;
     sf::Vector2f maxGfxSize;

@@ -5,6 +5,9 @@ namespace {
 JsonSchema createBackgroundSchema() {
     // Generic range
     SchemaGroup rangeGroup;
+    rangeGroup.addOptionalField("preserveAR", SchemaValue::anyBool);
+    rangeGroup.addOptionalField("allowHFlip", SchemaValue::anyBool);
+    rangeGroup.addOptionalField("allowVFlip", SchemaValue::anyBool);
     rangeGroup.addExpectedField("minx", SchemaValue::positiveNumber);
     rangeGroup.addExpectedField("miny", SchemaValue::positiveNumber);
     rangeGroup.addExpectedField("maxx", SchemaValue::positiveNumber);
